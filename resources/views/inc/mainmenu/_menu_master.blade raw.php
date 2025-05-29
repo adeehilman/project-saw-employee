@@ -45,7 +45,7 @@
         </li>
     </ul>
 </li>
-{{-- <li class="{{ Request::is('akademik/*') ? 'active open' : '' }}">
+<li class="{{ Request::is('akademik/*') ? 'active open' : '' }}">
     <a href="#" title="Akademik" data-filter-tags="akademik">
         <i class="fal fa-briefcase"></i>
         <span class="nav-link-text" data-i18n="nav.akademik">Akademik</span>
@@ -92,7 +92,7 @@
             </a>
         </li>
     </ul>
-</li> --}}
+</li>
 <li class="{{ Request::is('kurikulum/*') ? 'active open' : '' }}">
     <a href="#" title="Kurikulum" data-filter-tags="kurikulum">
         <i class="fal fa-credit-card"></i>
@@ -155,24 +155,6 @@
             <a href="{{ route('transkrip_nilai') }}" title="Transkrip Nilai"
                 data-filter-tags="kurikulum transkrip nilai">
                 <span class="nav-link-text" data-i18n="nav.kurikulum_transkrip_nilai">Transkrip Nilai</span>
-            </a>
-        </li>
-    </ul>
-</li>
-
-
-{{-- after --}}
-{{-- TODO: Delete the comment if not needed --}}
-<li class="{{ Request::is('karyawan/*') ? 'active open' : '' }}">
-    <a href="#" title="Karyawan" data-filter-tags="Karyawan">
-        <i class="fal fa-briefcase"></i>
-        <span class="nav-link-text" data-i18n="nav.Karyawan">Karyawan</span>
-    </a>
-    <ul>
-        <li class="{{ Request::is('karyawan/kelola_karyawan*') ? 'active' : '' }}">
-            <a href="{{ route('kelola_karyawan.index') }}" title="Kelola Karyawan"
-                data-filter-tags="karyawan kelola karyawan">
-                <span class="nav-link-text" data-i18n="nav.karyawan_kelola_karyawan">Kelola Karyawan</span>
             </a>
         </li>
     </ul>

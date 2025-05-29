@@ -2,7 +2,8 @@
 
 use App\Http\Controllers\AppFiturController;
 use App\Http\Controllers\AppProfileController;
-use App\Http\Controllers\DataGuruController;
+// use App\Http\Controllers\DataGuruController;
+use App\Http\Controllers\KelolaKaryawanController;
 use App\Http\Controllers\MasterController;
 use App\Http\Controllers\TahunAjaranController;
 use App\Http\Controllers\ProfilSekolahController;
@@ -63,7 +64,7 @@ Route::middleware('admin')->prefix('admin')->group(function () {
     Route::get('/profil_admin', [MasterController::class, 'master_profil'])->name('profil_admin');
 });
 //AKADEMIK
-Route::middleware('admin')->prefix('akademik')->group(function () {
+Route::middleware('admin')->prefix('karyawan')->group(function () {
 
     Route::get('profil-sekolah', [ProfilSekolahController::class, 'show'])->name('profil-sekolah.index');
     Route::get('profil-sekolah/edit', [ProfilSekolahController::class, 'edit'])->name('profil-sekolah.edit');
@@ -71,7 +72,6 @@ Route::middleware('admin')->prefix('akademik')->group(function () {
 
     Route::resource('kompetensi-keahlian', KompetensiKeahlianController::class);
 
-    Route::resource('tenaga_pendidik', DataGuruController::class);
 
     //Route::get('/indentitas_sekolah', [MasterController::class, 'akademik_indentitas_sekolah'])->name('indentitas_sekolah');
     //Route::get('/tenaga_pendidik', [MasterController::class, 'akademik_tenaga_pendidik'])->name('tenaga_pendidik');
@@ -80,7 +80,11 @@ Route::middleware('admin')->prefix('akademik')->group(function () {
     Route::get('/capaian_pembelajaran', [MasterController::class, 'akademik_capaian_pembelajaran'])->name('capaian_pembelajaran');
     Route::get('/kelas_walikelas', [MasterController::class, 'akademik_kelas_walikelas'])->name('kelas_walikelas');
     Route::get('/peserta_didik', [MasterController::class, 'akademik_peserta_didik'])->name('peserta_didik');
+
+
+    Route::resource('kelola_karyawan', KelolaKaryawanController::class);
 });
+
 
 
 //kurikulum
