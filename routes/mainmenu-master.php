@@ -4,6 +4,7 @@ use App\Http\Controllers\AppFiturController;
 use App\Http\Controllers\AppProfileController;
 // use App\Http\Controllers\DataGuruController;
 use App\Http\Controllers\KelolaKaryawanController;
+use App\Http\Controllers\PenilaianBobotKaryawanController;
 use App\Http\Controllers\MasterController;
 use App\Http\Controllers\TahunAjaranController;
 use App\Http\Controllers\ProfilSekolahController;
@@ -83,6 +84,11 @@ Route::middleware('admin')->prefix('karyawan')->group(function () {
 
 
     Route::resource('kelola_karyawan', KelolaKaryawanController::class);
+    Route::resource('kriteria_bobot', PenilaianBobotKaryawanController::class);
+});
+
+Route::middleware('admin')->prefix('penilaian')->group(function () {
+    Route::resource('kriteria_bobot', PenilaianBobotKaryawanController::class);
 });
 
 
