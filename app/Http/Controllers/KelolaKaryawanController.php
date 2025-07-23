@@ -74,7 +74,7 @@ class KelolaKaryawanController extends Controller
 
     public function edit($id)
     {
-        $dataGuru = DataKaryawan::findOrFail($id);
+        $dataKaryawans = DataKaryawan::findOrFail($id);
         return view('master.kelola_karyawan.edit', compact('dataGuru'));
     }
 

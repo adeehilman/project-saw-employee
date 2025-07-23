@@ -175,10 +175,10 @@
                 <span class="nav-link-text" data-i18n="nav.karyawan_kelola_karyawan">Kelola Karyawan</span>
             </a>
         </li>
-         <li class="{{ Request::is('karyawan/kelola_karyawan*') ? 'active' : '' }}">
-            <a href="{{ route('kelola_karyawan.index') }}" title="Kelola Karyawan"
-                data-filter-tags="karyawan kelola karyawan">
-                <span class="nav-link-text" data-i18n="nav.karyawan_kelola_karyawan">Penilaian Karyawan</span>
+         <li class="{{ Request::is('karyawan/karyawan_nilai*') ? 'active' : '' }}">
+            <a href="{{ route('karyawan_nilai.index') }}" title="Kelola Karyawan"
+                data-filter-tags="Penilaian Karyawan">
+                <span class="nav-link-text" data-i18n="nav.penilaian_karyawan">Penilaian Karyawan</span>
             </a>
         </li>
     </ul>

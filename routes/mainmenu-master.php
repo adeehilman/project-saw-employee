@@ -9,6 +9,7 @@ use App\Http\Controllers\MasterController;
 use App\Http\Controllers\TahunAjaranController;
 use App\Http\Controllers\ProfilSekolahController;
 use App\Http\Controllers\KompetensiKeahlianController;
+use App\Http\Controllers\PenilaianKaryawanController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -89,7 +90,11 @@ Route::middleware('admin')->prefix('karyawan')->group(function () {
 
 Route::middleware('admin')->prefix('penilaian')->group(function () {
     Route::resource('kriteria_bobot', PenilaianBobotKaryawanController::class);
+    Route::resource('karyawan_nilai', PenilaianKaryawanController::class);
+
 });
+
+
 
 
 
