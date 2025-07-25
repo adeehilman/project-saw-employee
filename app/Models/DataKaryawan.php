@@ -14,6 +14,6 @@ class DataKaryawan extends Model
     protected $keyType = 'string';
 
     protected $fillable = [
-        'id_karyawan', 'nama_karyawan', 'jabatan', 'jenis_kelamin', 'tanggal_masuk', 'user_id'
+        'id_karyawan', 'nama_karyawan', 'jabatan', 'jenis_kelamin', 'tanggal_masuk', 'user_id', 'is_active'
     ];
 }

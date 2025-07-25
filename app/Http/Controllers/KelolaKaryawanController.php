@@ -68,35 +68,42 @@ class KelolaKaryawanController extends Controller
 
     public function show($id)
     {
-        $dataGuru = DataKaryawan::findOrFail($id);
-        return view('master.kelola_karyawan.show', compact('dataGuru'));
+        $dataKaryawan = DataKaryawan::findOrFail($id);
+        return view('master.kelola_karyawan.show', compact('dataKaryawan'));
     }
 
     public function edit($id)
     {
-        $dataKaryawans = DataKaryawan::findOrFail($id);
-        return view('master.kelola_karyawan.edit', compact('dataGuru'));
+        $dataKaryawan = DataKaryawan::findOrFail($id);
+        return view('master.kelola_karyawan.edit', compact('dataKaryawan'));
     }
 
     public function update(Request $request, $id)
     {
         $request->validate([
-            'namalengkap' => 'required|string|max:100',
-            'jeniskelamin' => 'required|in:Laki-laki,Perempuan',
-            'jenisguru' => 'required|in:Kepala Sekolah,Produktif,Umum,BP/BK,Tata Usaha',
-            'email' => 'required|email|max:100|unique:data_gurus,email,' . $id . ',id_guru',
+            'nama_karyawan' => 'required|string|max:100',
+            'jenis_kelamin' => 'required|in:Laki-laki,Perempuan',
+            'jabatan' => 'required|string|max:100',
+            'tanggal_masuk' => 'required|date',
+            'aktif' => 'required|in:true,false'
         ]);
 
-        $dataGuru = DataKaryawan::findOrFail($id);
-        $dataGuru->update($request->all());
+        $dataKaryawan = DataKaryawan::findOrFail($id);
+        $dataKaryawan->update([
+            'nama_karyawan' => $request->nama_karyawan,
+            'jenis_kelamin' => $request->jenis_kelamin,
+            'jabatan' => $request->jabatan,
+            'tanggal_masuk' => $request->tanggal_masuk,
+            'is_active' => $request->aktif,
+        ]);
 
-        return redirect()->route('kelola_karyawan.index')->with('success', 'Data Guru updated successfully.');
+        return redirect()->route('kelola_karyawan.index')->with('success', 'Data Karyawan updated successfully.');
     }
 
     public function destroy($id)
     {
-        $dataGuru = DataKaryawan::findOrFail($id);
-        $dataGuru->delete();
+        $dataKaryawan = DataKaryawan::findOrFail($id);
+        $dataKaryawan->delete();
 
         return redirect()->route('kelola_karyawan.index')->with('success', 'Data Guru deleted successfully.');
     }

@@ -44,21 +44,20 @@
 
                 <div class="form-group">
                     <label for="jeniskelamin">Jenis Kelamin</label>
-                    <select name="jeniskelamin" id="jeniskelamin" class="form-control" required>
-                        <option value="Laki-laki" {{ old('jeniskelamin') == 'Laki-laki' ? 'selected' : '' }}>Laki-laki
-                        </option>
-                        <option value="Perempuan" {{ old('jeniskelamin') == 'Perempuan' ? 'selected' : '' }}>Perempuan
-                        </option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label for="tanggal_masuk">Tanggal Masuk</label>
-                    <input type="date" name="tanggal_masuk" id="tanggal_masuk" class="form-control" required
-                        value="{{ old(' ') }}">
-                </div>
-                <div class="form-group">
-                    <label for="email">Email</label>
-                    <input type="email" name="email" id="email" class="form-control" value="{{ old('email') }}" required>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="jeniskelamin" id="laki_laki_create" value="Laki-laki"
+                            {{ old('jeniskelamin') == 'Laki-laki' ? 'checked' : '' }} required>
+                        <label class="form-check-label" for="laki_laki_create">
+                            Laki-laki
+                        </label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="jeniskelamin" id="perempuan_create" value="Perempuan"
+                            {{ old('jeniskelamin') == 'Perempuan' ? 'checked' : '' }} required>
+                        <label class="form-check-label" for="perempuan_create">
+                            Perempuan
+                        </label>
+                    </div>
                 </div>
                 <div class="form-group">
                     <label for="jabatan">Jabatan</label>
@@ -66,12 +65,13 @@
                         value="{{ old('jabatan') }}">
                 </div>
                 <div class="form-group">
-                    <label for="aktif">Status Aktif</label>
-                    <select name="aktif" id="aktif" class="form-control" required>
-                        <option value="Aktif" {{ old('aktif') == 'Aktif' ? 'selected' : '' }}>Aktif</option>
-                        <option value="Tidak Aktif" {{ old('aktif') == 'Tidak Aktif' ? 'selected' : '' }}>Tidak Aktif
-                        </option>
-                    </select>
+                    <label for="tanggal_masuk">Tanggal Masuk</label>
+                    <input type="date" name="tanggal_masuk" id="tanggal_masuk" class="form-control" required
+                        value="{{ old('tanggal_masuk') }}">
+                </div>
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" name="email" id="email" class="form-control" value="{{ old('email') }}" required>
                 </div>
                 <x-slot name="panelcontentfoot">
                     <x-button type="submit" color="primary" :label="__('Save')" class="ml-auto" />
