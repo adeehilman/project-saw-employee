@@ -24,10 +24,10 @@ class DatabaseSeeder extends Seeder
             AppProfileSeeder::class,
             TahunAjaranSeeder::class,
             UserSeeder::class,
+            PemimpinPerusahaanSeeder::class,
             OpsiLoginSeeder::class,
             BidangKeahlianSeeder::class,
             ProgramKeahlianSeeder::class,
-            KompetensiKeahlianSeeder::class,
             ProfilSekolahSeeder::class,
             DataGuruSeeder::class,
         ]);

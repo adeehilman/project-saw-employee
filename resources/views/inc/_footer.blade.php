@@ -8,10 +8,7 @@
     </div>
     <div>
         <ul class="list-table m-0">
-            <li><a href="{{ route('introduction') }}" class="text-secondary fw-700">About</a></li>
-            <li class="pl-3"><a href="{{ route('licensing') }}" class="text-secondary fw-700">License</a></li>
-            <li class="pl-3"><a href="{{ route('general') }}" class="text-secondary fw-700">Documentation</a>
-            </li>
+            <li><a href="#" class="text-secondary fw-700">About</a></li>
             <li class="pl-3 fs-xl"><a href="https://wrapbootstrap.com/user/MyOrange" class="text-secondary"
                     target="_blank"><i class="fal fa-question-circle" aria-hidden="true"></i></a></li>
         </ul>

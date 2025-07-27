@@ -63,7 +63,7 @@
     <script>
         function confirmDelete(id) {
             bootbox.confirm({
-                message: "Apakah yakin akan di hapus kompetensi keahlian ini?",
+                message: "Apakah yakin akan di hapus karyawan ini?",
                 buttons: {
                     confirm: {
                         label: 'Yes',

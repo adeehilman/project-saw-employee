@@ -39,23 +39,39 @@
                             <td>{{ $kriteria->bobot }}</td>
                             <td>
                                 @if ($kriteria->status == 'Menunggu')
-                                    <span class="badge badge-secondary">{{ $kriteria->status }}</span>
+                                    <span class="badge badge-warning">Menunggu Persetujuan</span>
                                 @elseif ($kriteria->status == 'Ditolak')
-                                    <span class="badge badge-danger">{{ $kriteria->status }}</span>
+                                    <span class="badge badge-danger">Ditolak</span>
                                 @elseif ($kriteria->status == 'Disetujui')
-                                    <span class="badge badge-success">{{ $kriteria->status }}</span>
+                                    <span class="badge badge-success">Disetujui</span>
+                                @else
+                                    <span class="badge badge-secondary">{{ $kriteria->status }}</span>
                                 @endif
                             </td>
                             <td>
+                                <a href="{{ route('kriteria_bobot.show', $kriteria->id_kriteria) }}" class="btn btn-info btn-sm">
+                                    <i class="fal fa-eye"></i> Detail
+                                </a>
                                 @if ($kriteria->status != 'Disetujui')
-                                    <a href="{{ route('kriteria_bobot.edit', $kriteria->id_kriteria) }}"
-                                        class="btn btn-warning">Edit</a>
-                                    <form action="{{ route('kriteria_bobot.destroy', $kriteria->id_kriteria) }}" method="POST"
-                                        style="display:inline-block;">
+                                    <a href="{{ route('kriteria_bobot.edit', $kriteria->id_kriteria) }}" class="btn btn-warning btn-sm">
+                                        <i class="fal fa-edit"></i> Edit
+                                    </a>
+                                    <form id="delete-form-{{ $kriteria->id_kriteria }}" action="{{ route('kriteria_bobot.destroy', $kriteria->id_kriteria) }}" method="POST" style="display:inline-block;">
                                         @csrf
                                         @method('DELETE')
-                                        <button type="button" class="btn btn-danger" onclick="confirmDelete({{ $kriteria->id_kriteria }})">Hapus</button>
+                                        <button type="button" class="btn btn-danger btn-sm" onclick="confirmDelete('{{ $kriteria->id_kriteria }}')">
+                                            <i class="fal fa-trash"></i> Hapus
+                                        </button>
                                     </form>
+                                @else
+                                    <span class="text-muted small">
+                                        <i class="fal fa-lock"></i> Sudah disetujui
+                                    </span>
+                                @endif
+                                @if ($kriteria->status == 'Ditolak' && $kriteria->rejection_reason)
+                                    <button type="button" class="btn btn-outline-danger btn-sm" onclick="showRejectionReason('{{ addslashes($kriteria->rejection_reason) }}')">
+                                        <i class="fal fa-exclamation-triangle"></i> Alasan Penolakan
+                                    </button>
                                 @endif
                             </td>
                         </tr>
@@ -64,12 +80,36 @@
             </table>
         </x-panel.show>
     </main>
+
+    <!-- Rejection Reason Modal -->
+    <div class="modal fade" id="rejectionReasonModal" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Alasan Penolakan</h5>
+                    <button type="button" class="close" data-dismiss="modal">
+                        <span>&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="alert alert-danger">
+                        <h6><i class="fal fa-exclamation-triangle"></i> Kriteria Ditolak</h6>
+                        <p id="rejectionReasonText" class="mb-0"></p>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Tutup</button>
+                </div>
+            </div>
+        </div>
+    </div>
 @endsection
 @section('pages-script')
     <script>
         function confirmDelete(id) {
+            console.log("id", id);
             bootbox.confirm({
-                message: "Apakah yakin akan di hapus kompetensi keahlian ini?",
+                message: "Apakah yakin akan di hapus kriteria ini?",
                 buttons: {
                     confirm: {
                         label: 'Yes',
@@ -86,6 +126,11 @@
                     }
                 }
             });
+        }
+
+        function showRejectionReason(reason) {
+            $('#rejectionReasonText').text(reason);
+            $('#rejectionReasonModal').modal('show');
         }
     </script>
     <script src="/admin/js/datagrid/datatables/datatables.bundle.js"></script>

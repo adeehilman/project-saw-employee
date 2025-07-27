@@ -29,9 +29,16 @@ class AuthController extends Controller
 
     public function logout()
     {
+        // Store user info before logout for success message
+        $userName = Auth::user()->name;
+
         Auth::logout();
         request()->session()->invalidate();
         request()->session()->regenerate();
+
+        // Add success message to session
+        request()->session()->flash('logout_success', 'Anda telah berhasil logout. Terima kasih ' . $userName . '!');
+
         return redirect('/');
     }
 }

@@ -16,29 +16,6 @@
                             </span>
                         </a>
                     </li>
-                    <li>
-                        <a href="{{ route('general_inbox') }}" class="app-list-item text-white border-0 m-0">
-                            <div class="icon-stack">
-                                <i class="base base-7 icon-stack-3x opacity-100 color-success-500 "></i>
-                                <i class="base base-7 icon-stack-2x opacity-100 color-success-300 "></i>
-                                <i class="ni ni-envelope icon-stack-1x text-white"></i>
-                            </div>
-                            <span class="app-list-name">
-                                Inbox
-                            </span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="{{ route('introduction') }}" class="app-list-item text-white border-0 m-0">
-                            <div class="icon-stack">
-                                <i class="base base-7 icon-stack-2x opacity-100 color-primary-300 "></i>
-                                <i class="fal fa-plus icon-stack-1x opacity-100 color-white"></i>
-                            </div>
-                            <span class="app-list-name">
-                                Add More
-                            </span>
-                        </a>
-                    </li>
                 </ul>
             </div>
         </div>

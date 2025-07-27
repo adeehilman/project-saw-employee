@@ -65,9 +65,8 @@ class Kernel extends HttpKernel
         'throttle' => \Illuminate\Routing\Middleware\ThrottleRequests::class,
         'verified' => \Illuminate\Auth\Middleware\EnsureEmailIsVerified::class,
         'admin' => \App\Http\Middleware\IsAdmin::class,
-        'walas' => \App\Http\Middleware\IsWaliKelas::class,
-        'gmp' => \App\Http\Middleware\IsGuruMapel::class,
-        'siswa' => \App\Http\Middleware\IsSIswa::class,
+        'approval' => \App\Http\Middleware\ApprovalMiddleware::class,
+        'pemimpin' => \App\Http\Middleware\IsPemimpinPerusahaan::class,
     ];
 
     protected $routeMiddleware = [

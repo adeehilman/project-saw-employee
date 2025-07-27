@@ -31,20 +31,23 @@ class PenilaianBobotKaryawanController extends Controller
         try {
             $request->validate([
                 'kriteria' => 'required|string|max:100',
-                'bobot' => 'required',
+                'bobot' => 'required|numeric|min:1|max:100',
             ]);
 
-            // Create user from request
+            // Create criteria with pending status
             $KriteriaBobot = KriteriaBobot::create([
                 'kriteria' => $request->kriteria,
                 'bobot' => $request->bobot,
+                'status' => 'Menunggu',
+                'createby' => auth()->id(),
+                'submitted_at' => now()
             ]);
 
-            return redirect()->route('kriteria_bobot.index')->with('success', 'Data Kriteria dan Bobot created successfully.');
+            return redirect()->route('kriteria_bobot.index')
+                ->with('success', 'Data Kriteria dan Bobot berhasil dibuat dan menunggu persetujuan.');
         } catch (\Throwable $th) {
             return redirect()->back()->with('error', $th->getMessage());
         }
-
     }
 
     public function show($id)
@@ -61,17 +64,46 @@ class PenilaianBobotKaryawanController extends Controller
 
     public function update(Request $request, $id)
     {
-        $kriteriaDanBobot = KriteriaBobot::findOrFail($id);
-        $kriteriaDanBobot->update($request->all());
+        $request->validate([
+            'kriteria' => 'required|string|max:100',
+            'bobot' => 'required|numeric|min:1|max:100',
+        ]);
 
-        return redirect()->route('kriteria_bobot.index')->with('success', 'Data Guru updated successfully.');
+        $kriteriaDanBobot = KriteriaBobot::findOrFail($id);
+
+        // Only allow updates if not approved
+        if ($kriteriaDanBobot->isApproved()) {
+            return redirect()->back()->with('error', 'Kriteria yang sudah disetujui tidak dapat diubah.');
+        }
+
+        $oldStatus = $kriteriaDanBobot->status;
+
+        $kriteriaDanBobot->update([
+            'kriteria' => $request->kriteria,
+            'bobot' => $request->bobot,
+            'status' => 'Menunggu', // Reset to pending after update
+            'submitted_at' => now(),
+            'approved_by' => null,
+            'approved_at' => null,
+            'rejection_reason' => null
+        ]);
+
+        return redirect()->route('kriteria_bobot.index')
+            ->with('success', 'Data Kriteria dan Bobot berhasil diperbarui dan menunggu persetujuan ulang.');
     }
 
     public function destroy($id)
     {
-        $dataGuru = KriteriaBobot::findOrFail($id);
-        $dataGuru->delete();
+        $kriteria = KriteriaBobot::findOrFail($id);
 
-        return redirect()->route('kriteria_bobot.index')->with('success', 'Data Guru deleted successfully.');
+        // Only allow deletion if not approved
+        if ($kriteria->isApproved()) {
+            return redirect()->back()->with('error', 'Kriteria yang sudah disetujui tidak dapat dihapus.');
+        }
+
+        $kriteria->delete();
+
+        return redirect()->route('kriteria_bobot.index')
+            ->with('success', 'Data Kriteria dan Bobot berhasil dihapus.');
     }
 }

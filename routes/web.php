@@ -33,8 +33,4 @@ Route::post('/logout', [AuthController::class, 'logout']);
 Route::get('/dashboard', [TemplateController::class, 'index'])->middleware(['auth', 'check.role.status']);
 Route::get('/about', [TemplateController::class, 'about'])->middleware(['auth', 'check.role.status']);
 
-require __DIR__ . '/mainmenu-template.php';
 require __DIR__ . '/mainmenu-master.php';
-require __DIR__ . '/mainmenu-walikelas.php';
-require __DIR__ . '/mainmenu-gurumapel.php';
-require __DIR__ . '/mainmenu-siswa.php';
