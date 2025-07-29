@@ -9,26 +9,36 @@ use Illuminate\Support\Collection;
 
 class SAWCalculationService
 {
+
+
     /**
-     * Calculate SAW scores for all employees in a given period
+     * Calculate SAW scores for all employees in a given date range
      */
-    public function calculateSAWScores($period)
+    public function calculateSAWScores($startDate, $endDate)
     {
         // Step 1: Get approved criteria with weights
         $criteria = KriteriaBobot::where('status', 'Disetujui')->get();
-        
+
         if ($criteria->isEmpty()) {
             return collect();
         }
 
-        // Step 2: Get all employees with assessments for the period
+        // Step 2: Get all employees with assessments for the date range
         $employees = DataKaryawan::where('is_active', true)
-            ->with(['penilaian' => function($query) use ($period) {
-                $query->where('periode_penilaian', $period)
+            ->with(['penilaian' => function($query) use ($startDate, $endDate) {
+                $query->whereBetween('waktu_penilaian', [$startDate, $endDate])
                       ->with('kriteriaBobot');
             }])
             ->get();
 
+        return $this->processSAWCalculation($employees, $criteria);
+    }
+
+    /**
+     * Process SAW calculation for given employees and criteria
+     */
+    private function processSAWCalculation($employees, $criteria)
+    {
         // Filter employees who have at least one assessment
         $assessedEmployees = $employees->filter(function($employee) {
             return $employee->penilaian->count() > 0;
@@ -39,11 +49,11 @@ class SAWCalculationService
         }
 
         // Step 3: Create decision matrix
-        $decisionMatrix = $this->createDecisionMatrix($assessedEmployees, $criteria, $period);
-        
+        $decisionMatrix = $this->createDecisionMatrix($assessedEmployees, $criteria);
+
         // Step 4: Normalize the matrix
         $normalizedMatrix = $this->normalizeMatrix($decisionMatrix, $criteria);
-        
+
         // Step 5: Calculate SAW scores
         $sawScores = $this->calculateFinalScores($normalizedMatrix, $criteria);
         
@@ -56,7 +66,7 @@ class SAWCalculationService
     /**
      * Create decision matrix from employee assessments
      */
-    private function createDecisionMatrix($employees, $criteria, $period)
+    private function createDecisionMatrix($employees, $criteria)
     {
         $matrix = [];
 
@@ -178,26 +188,30 @@ class SAWCalculationService
         return $ranked;
     }
 
+
+
     /**
      * Get SAW calculation details for a specific employee
      */
-    public function getEmployeeSAWDetails($employeeId, $period)
+    public function getEmployeeSAWDetails($employeeId, $startDate, $endDate)
     {
-        $allScores = $this->calculateSAWScores($period);
-        
+        $allScores = $this->calculateSAWScores($startDate, $endDate);
+
         return $allScores->firstWhere('employee.id_karyawan', $employeeId);
     }
+
+
 
     /**
      * Get criteria statistics for normalization reference
      */
-    public function getCriteriaStatistics($period)
+    public function getCriteriaStatistics($startDate, $endDate)
     {
         $criteria = KriteriaBobot::where('status', 'Disetujui')->get();
         $statistics = [];
 
         foreach ($criteria as $criterion) {
-            $assessments = PenilaianKaryawan::where('periode_penilaian', $period)
+            $assessments = PenilaianKaryawan::whereBetween('waktu_penilaian', [$startDate, $endDate])
                 ->where('id_kriteria_bobot', $criterion->id_kriteria)
                 ->pluck('nilai');
 
@@ -215,14 +229,16 @@ class SAWCalculationService
         return $statistics;
     }
 
+
+
     /**
      * Validate if SAW calculation can be performed
      */
-    public function canPerformSAW($period)
+    public function canPerformSAW($startDate, $endDate)
     {
         $approvedCriteria = KriteriaBobot::where('status', 'Disetujui')->count();
-        $assessmentsCount = PenilaianKaryawan::where('periode_penilaian', $period)->count();
-        
+        $assessmentsCount = PenilaianKaryawan::whereBetween('waktu_penilaian', [$startDate, $endDate])->count();
+
         return [
             'can_calculate' => $approvedCriteria > 0 && $assessmentsCount > 0,
             'approved_criteria' => $approvedCriteria,

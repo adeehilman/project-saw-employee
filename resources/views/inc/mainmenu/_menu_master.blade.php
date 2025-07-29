@@ -60,12 +60,6 @@
                 <span class="nav-link-text" data-i18n="nav.karyawan_kelola_karyawan">Kelola Karyawan</span>
             </a>
         </li>
-         <li class="{{ Request::is('karyawan/karyawan_nilai*') ? 'active' : '' }}">
-            <a href="{{ route('karyawan_nilai.index') }}" title="Kelola Karyawan"
-                data-filter-tags="Penilaian Karyawan">
-                <span class="nav-link-text" data-i18n="nav.penilaian_karyawan">Penilaian Karyawan</span>
-            </a>
-        </li>
     </ul>
 </li>
 
@@ -83,7 +77,7 @@
         </li>
         @if(auth()->user()->role == 'Admin')
         <li class="{{ Request::is('scoring*') ? 'active' : '' }}">
-            <a href="{{ route('scoring.index') }}" title="Penilaian Karyawan"
+            <a href="{{ route('penilaian_karyawan.index') }}" title="Penilaian Karyawan"
                 data-filter-tags="penilaian karyawan nilai">
                 <span class="nav-link-text" data-i18n="nav.penilaian_karyawan_scoring">Penilaian Karyawan</span>
             </a>

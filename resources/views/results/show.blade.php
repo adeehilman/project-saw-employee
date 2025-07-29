@@ -48,7 +48,7 @@
                 <x-panel.show title="Informasi Karyawan" subtitle="Data karyawan dan periode penilaian">
                     <x-slot name="paneltoolbar">
                         <x-panel.tool-bar>
-                            <a href="{{ route('results.index', ['period' => $period]) }}" class="btn btn-secondary btn-sm">
+                            <a href="{{ route('results.index', ['start_date' => $startDate, 'end_date' => $endDate]) }}" class="btn btn-secondary btn-sm">
                                 <i class="fal fa-arrow-left"></i> Kembali
                             </a>
                         </x-panel.tool-bar>
@@ -83,7 +83,7 @@
                                 </tr>
                                 <tr>
                                     <td><strong>Periode Penilaian:</strong></td>
-                                    <td><strong>{{ \Carbon\Carbon::parse($period)->format('F Y') }}</strong></td>
+                                    <td><strong>{{ \Carbon\Carbon::parse($startDate)->format('d/m/Y') }} - {{ \Carbon\Carbon::parse($endDate)->format('d/m/Y') }}</strong></td>
                                 </tr>
                                 <tr>
                                     <td><strong>Status Penilaian:</strong></td>
@@ -188,7 +188,7 @@
                     <h6>Keterangan Normalisasi:</h6>
                     <ul class="list-unstyled">
                         <li><strong>Nilai Asli:</strong> Nilai yang diberikan (0-100)</li>
-                        <li><strong>Nilai Max:</strong> Nilai tertinggi untuk kriteria ini di periode yang sama</li>
+                        <li><strong>Nilai Max:</strong> Nilai tertinggi untuk kriteria ini di rentang tanggal yang sama</li>
                         <li><strong>Normalisasi:</strong> Nilai Asli ÷ Nilai Max</li>
                         <li><strong>Skor Tertimbang:</strong> Normalisasi × Bobot</li>
                     </ul>
@@ -257,7 +257,7 @@
                 <div class="text-center py-5">
                     <i class="fal fa-star text-muted" style="font-size: 4rem;"></i>
                     <h4 class="mt-3">Belum Ada Penilaian</h4>
-                    <p class="text-muted">Karyawan ini belum dinilai untuk periode {{ \Carbon\Carbon::parse($period)->format('F Y') }}.</p>
+                    <p class="text-muted">Karyawan ini belum dinilai untuk rentang tanggal {{ \Carbon\Carbon::parse($startDate)->format('d/m/Y') }} - {{ \Carbon\Carbon::parse($endDate)->format('d/m/Y') }}.</p>
                 </div>
             @endif
         </x-panel.show>

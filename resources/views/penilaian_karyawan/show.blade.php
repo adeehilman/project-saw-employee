@@ -49,15 +49,15 @@
                 <x-panel.show title="Informasi Karyawan" subtitle="Data karyawan dan periode penilaian">
                     <x-slot name="paneltoolbar">
                         <x-panel.tool-bar>
-                            <a href="{{ route('scoring.index', ['period' => $period]) }}" class="btn btn-secondary btn-sm">
+                            <a href="{{ route('penilaian_karyawan.index', ['start_date' => $startDate, 'end_date' => $endDate]) }}" class="btn btn-secondary btn-sm">
                                 <i class="fal fa-arrow-left"></i> Kembali
                             </a>
                             @if($assessments->count() > 0)
-                                <a href="{{ route('scoring.edit', ['employee' => $employee->id_karyawan, 'period' => $period]) }}" class="btn btn-warning btn-sm">
+                                <a href="{{ route('penilaian_karyawan.edit', ['employee' => $employee->id_karyawan, 'start_date' => $startDate, 'end_date' => $endDate]) }}" class="btn btn-warning btn-sm">
                                     <i class="fal fa-edit"></i> Edit Penilaian
                                 </a>
                             @else
-                                <a href="{{ route('scoring.create', ['employee' => $employee->id_karyawan, 'period' => $period]) }}" class="btn btn-primary btn-sm">
+                                <a href="{{ route('penilaian_karyawan.create', ['employee' => $employee->id_karyawan, 'start_date' => $startDate, 'end_date' => $endDate]) }}" class="btn btn-primary btn-sm">
                                     <i class="fal fa-star"></i> Buat Penilaian
                                 </a>
                             @endif
@@ -93,7 +93,7 @@
                                 </tr>
                                 <tr>
                                     <td><strong>Periode Penilaian:</strong></td>
-                                    <td><strong>{{ \Carbon\Carbon::parse($period)->format('F Y') }}</strong></td>
+                                    <td><strong>{{ \Carbon\Carbon::parse($startDate)->format('d/m/Y') }} - {{ \Carbon\Carbon::parse($endDate)->format('d/m/Y') }}</strong></td>
                                 </tr>
                                 <tr>
                                     <td><strong>Status Penilaian:</strong></td>
@@ -198,7 +198,7 @@
                     <h6>Keterangan Normalisasi:</h6>
                     <ul class="list-unstyled">
                         <li><strong>Nilai Asli:</strong> Nilai yang diberikan (0-100)</li>
-                        <li><strong>Nilai Max:</strong> Nilai tertinggi untuk kriteria ini di periode yang sama</li>
+                        <li><strong>Nilai Max:</strong> Nilai tertinggi untuk kriteria ini di rentang tanggal yang sama</li>
                         <li><strong>Normalisasi:</strong> Nilai Asli ÷ Nilai Max</li>
                         <li><strong>Skor Tertimbang:</strong> Normalisasi × Bobot</li>
                     </ul>
@@ -267,8 +267,8 @@
                 <div class="text-center py-5">
                     <i class="fal fa-star text-muted" style="font-size: 4rem;"></i>
                     <h4 class="mt-3">Belum Ada Penilaian</h4>
-                    <p class="text-muted">Karyawan ini belum dinilai untuk periode {{ \Carbon\Carbon::parse($period)->format('F Y') }}.</p>
-                    <a href="{{ route('scoring.create', ['employee' => $employee->id_karyawan, 'period' => $period]) }}" class="btn btn-primary">
+                    <p class="text-muted">Karyawan ini belum dinilai untuk rentang tanggal {{ \Carbon\Carbon::parse($startDate)->format('d/m/Y') }} - {{ \Carbon\Carbon::parse($endDate)->format('d/m/Y') }}.</p>
+                    <a href="{{ route('penilaian_karyawan.create', ['employee' => $employee->id_karyawan, 'start_date' => $startDate, 'end_date' => $endDate]) }}" class="btn btn-primary">
                         <i class="fal fa-star"></i> Buat Penilaian
                     </a>
                 </div>

@@ -169,7 +169,6 @@ return [
         App\Providers\EventServiceProvider::class,
         App\Providers\RouteServiceProvider::class,
         App\Providers\AppProfileProvider::class,
-        App\Providers\TahunAjaranServiceProvider::class,
     ])->toArray(),
 
     /*

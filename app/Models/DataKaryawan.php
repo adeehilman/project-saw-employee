@@ -33,12 +33,14 @@ class DataKaryawan extends Model
         return $this->hasMany(PenilaianKaryawan::class, 'id_karyawan', 'id_karyawan');
     }
 
+
+
     /**
-     * Get assessments for a specific period
+     * Get assessments for a date range
      */
-    public function penilaianPeriode($period)
+    public function penilaianDateRange($startDate, $endDate)
     {
-        return $this->penilaian()->where('periode_penilaian', $period);
+        return $this->penilaian()->whereBetween('waktu_penilaian', [$startDate, $endDate]);
     }
 
     /**
@@ -47,26 +49,26 @@ class DataKaryawan extends Model
     public function getLatestAssessmentPeriod()
     {
         return $this->penilaian()
-            ->orderBy('periode_penilaian', 'desc')
-            ->first()?->periode_penilaian;
+            ->orderBy('waktu_penilaian', 'desc')
+            ->first()?->waktu_penilaian;
     }
 
 
 
     /**
-     * Calculate SAW score for a specific period
+     * Calculate SAW score for a specific date range
      */
-    public function getSAWScore($period)
+    public function getSAWScore($startDate, $endDate)
     {
-        return PenilaianKaryawan::calculateSAWScore($this->id_karyawan, $period);
+        return PenilaianKaryawan::calculateSAWScore($this->id_karyawan, $startDate, $endDate);
     }
 
     /**
-     * Get SAW ranking for a specific period
+     * Get SAW ranking for a specific date range
      */
-    public function getSAWRank($period)
+    public function getSAWRank($startDate, $endDate)
     {
-        return PenilaianKaryawan::getEmployeeRank($this->id_karyawan, $period);
+        return PenilaianKaryawan::getEmployeeRank($this->id_karyawan, $startDate, $endDate);
     }
 
 

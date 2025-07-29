@@ -5,6 +5,7 @@
     <link rel="stylesheet" media="screen, print" href="/admin/css/theme-demo.css">
     <link rel="stylesheet" media="screen, print" href="/admin/css/notifications/toastr/toastr.css">
     <link rel="stylesheet" media="screen, print" href="/admin/css/datagrid/datatables/datatables.bundle.css">
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
     <style>
         .rank-badge {
             font-size: 1.2rem;
@@ -58,21 +59,26 @@
             @endcomponent
         </div>
 
-        <!-- Period Selection -->
+        <!-- Date Range Selection -->
         <div class="row mb-3">
             <div class="col-md-6">
                 <div class="form-group">
-                    <label for="period-select">Periode Penilaian:</label>
-                    <select id="period-select" class="form-control">
-                        <option value="{{ $period }}">{{ \Carbon\Carbon::parse($period)->format('F Y') }}</option>
-                    </select>
+                    <label for="waktu-penilaian-range">Waktu Penilaian:</label>
+                    <div class="input-group">
+                        <input type="text" id="waktu-penilaian-range" class="form-control" readonly>
+                        <div class="input-group-append">
+                            <span class="input-group-text">
+                                <i class="fal fa-calendar-alt"></i>
+                            </span>
+                        </div>
+                    </div>
                 </div>
             </div>
             <div class="col-md-6">
                 <div class="form-group">
                     <label>&nbsp;</label>
                     <div>
-                        <a href="{{ route('results.index', ['period' => $period]) }}" class="btn btn-secondary">
+                        <a href="{{ route('results.index', ['start_date' => $startDate, 'end_date' => $endDate]) }}" class="btn btn-secondary">
                             <i class="fal fa-arrow-left"></i> Kembali ke Hasil
                         </a>
                         <button class="btn btn-info" onclick="showSAWMethodology()">
@@ -164,7 +170,7 @@
                                         </div>
                                     </td>
                                     <td>
-                                        <a href="{{ route('results.show', ['employee' => $result['employee']->id_karyawan, 'period' => $period]) }}"
+                                        <a href="{{ route('results.show', ['employee' => $result['employee']->id_karyawan, 'start_date' => $startDate, 'end_date' => $endDate]) }}"
                                             class="btn btn-info btn-sm">
                                             <i class="fal fa-eye"></i> Detail
                                         </a>
@@ -241,7 +247,7 @@
                             </li>
                         </ul>
                     </div>
-                    <a href="{{ route('results.index', ['period' => $period]) }}" class="btn btn-primary">
+                    <a href="{{ route('results.index', ['start_date' => $startDate, 'end_date' => $endDate]) }}" class="btn btn-primary">
                         <i class="fal fa-arrow-left"></i> Kembali ke Hasil
                     </a>
                 </div>
@@ -313,6 +319,8 @@
 
 @section('pages-script')
     <script src="/admin/js/datagrid/datatables/datatables.bundle.js"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
     <script>
         $(document).ready(function() {
             // Initialize DataTable
@@ -323,6 +331,38 @@
                 ], // Sort by rank
                 pageLength: 25
             });
+
+            // Initialize daterangepicker
+            $('#waktu-penilaian-range').daterangepicker({
+                startDate: moment('{{ $startDate }}'),
+                endDate: moment('{{ $endDate }}'),
+                locale: {
+                    format: 'DD/MM/YYYY',
+                    separator: ' - ',
+                    applyLabel: 'Terapkan',
+                    cancelLabel: 'Batal',
+                    fromLabel: 'Dari',
+                    toLabel: 'Sampai',
+                    customRangeLabel: 'Kustom',
+                    weekLabel: 'M',
+                    daysOfWeek: ['Min', 'Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab'],
+                    monthNames: ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
+                        'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'],
+                    firstDay: 1
+                },
+                ranges: {
+                    'Bulan Ini': [moment().startOf('month'), moment().endOf('month')],
+                    'Bulan Lalu': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')],
+                    '3 Bulan Terakhir': [moment().subtract(3, 'month').startOf('month'), moment().endOf('month')],
+                    '6 Bulan Terakhir': [moment().subtract(6, 'month').startOf('month'), moment().endOf('month')],
+                    'Tahun Ini': [moment().startOf('year'), moment().endOf('year')]
+                }
+            }, function(start, end, label) {
+                // When date range changes, reload the page with new parameters
+                const startDate = start.format('YYYY-MM-DD');
+                const endDate = end.format('YYYY-MM-DD');
+                window.location.href = `{{ route('results.ranking') }}?start_date=${startDate}&end_date=${endDate}`;
+            });
         });
 
         function showSAWMethodology() {
@@ -330,7 +370,8 @@
         }
 
         function showSAWDetails(employeeId) {
-            const period = '{{ $period }}';
+            const startDate = '{{ $startDate }}';
+            const endDate = '{{ $endDate }}';
 
             // Show loading
             $('#sawDetailsContent').html(
@@ -338,7 +379,7 @@
             $('#sawDetailsModal').modal('show');
 
             // Fetch SAW details
-            $.get(`{{ route('results.saw-details') }}?employee_id=${employeeId}&period=${period}`)
+            $.get(`{{ route('results.saw-details') }}?employee_id=${employeeId}&start_date={{ $startDate }}&end_date={{ $endDate }}`)
                 .done(function(data) {
                     if (data) {
                         let content = `
@@ -396,8 +437,9 @@
         }
 
         function exportRanking(format = 'excel') {
-            const period = '{{ $period }}';
-            const url = `{{ route('results.export') }}?period=${period}&format=${format}`;
+            const startDate = '{{ $startDate }}';
+            const endDate = '{{ $endDate }}';
+            const url = `{{ route('results.export') }}?start_date=${startDate}&end_date=${endDate}&format=${format}`;
 
             // Create temporary link and trigger download
             const link = document.createElement('a');

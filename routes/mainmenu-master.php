@@ -6,8 +6,6 @@ use App\Http\Controllers\AppProfileController;
 use App\Http\Controllers\KelolaKaryawanController;
 use App\Http\Controllers\PenilaianBobotKaryawanController;
 use App\Http\Controllers\MasterController;
-use App\Http\Controllers\TahunAjaranController;
-use App\Http\Controllers\ProfilSekolahController;
 use App\Http\Controllers\PenilaianKaryawanController;
 use Illuminate\Support\Facades\Route;
 
@@ -66,12 +64,6 @@ Route::middleware('admin')->prefix('admin')->group(function () {
 });
 //AKADEMIK
 Route::middleware('admin')->prefix('karyawan')->group(function () {
-
-    Route::get('profil-sekolah', [ProfilSekolahController::class, 'show'])->name('profil-sekolah.index');
-    Route::get('profil-sekolah/edit', [ProfilSekolahController::class, 'edit'])->name('profil-sekolah.edit');
-    Route::put('profil-sekolah', [ProfilSekolahController::class, 'update'])->name('profil-sekolah.update');
-
-
     //Route::get('/indentitas_sekolah', [MasterController::class, 'akademik_indentitas_sekolah'])->name('indentitas_sekolah');
     //Route::get('/tenaga_pendidik', [MasterController::class, 'akademik_tenaga_pendidik'])->name('tenaga_pendidik');
 
@@ -81,33 +73,32 @@ Route::middleware('admin')->prefix('karyawan')->group(function () {
 
 Route::middleware('admin')->prefix('penilaian')->group(function () {
     Route::resource('kriteria_bobot', PenilaianBobotKaryawanController::class);
-    Route::resource('karyawan_nilai', PenilaianKaryawanController::class);
 });
 
 // Employee Scoring routes - accessible by Admin
-Route::prefix('scoring')->group(function () {
-    Route::get('/', [App\Http\Controllers\EmployeeScoringController::class, 'index'])->name('scoring.index');
-    Route::get('/summary', [App\Http\Controllers\EmployeeScoringController::class, 'getSummary'])->name('scoring.summary');
-    Route::get('/export', [App\Http\Controllers\EmployeeScoringController::class, 'export'])->name('scoring.export');
-    Route::get('/ranking', [App\Http\Controllers\EmployeeScoringController::class, 'ranking'])->name('scoring.ranking');
-    Route::get('/saw-details', [App\Http\Controllers\EmployeeScoringController::class, 'getSAWDetails'])->name('scoring.saw-details');
-    Route::get('/criteria-stats', [App\Http\Controllers\EmployeeScoringController::class, 'getCriteriaStats'])->name('scoring.criteria-stats');
-    Route::get('/{employee}/create', [App\Http\Controllers\EmployeeScoringController::class, 'create'])->name('scoring.create');
-    Route::get('/{employee}/edit', [App\Http\Controllers\EmployeeScoringController::class, 'edit'])->name('scoring.edit');
-    Route::get('/{employee}/show', [App\Http\Controllers\EmployeeScoringController::class, 'show'])->name('scoring.show');
-    Route::post('/store', [App\Http\Controllers\EmployeeScoringController::class, 'store'])->name('scoring.store');
-    Route::delete('/{assessment}', [App\Http\Controllers\EmployeeScoringController::class, 'destroy'])->name('scoring.destroy');
-    Route::delete('/bulk-delete', [App\Http\Controllers\EmployeeScoringController::class, 'bulkDelete'])->name('scoring.bulk-delete');
+Route::prefix('penilaian_karyawan')->group(function () {
+    Route::get('/', [PenilaianKaryawanController::class, 'index'])->name('penilaian_karyawan.index');
+    Route::get('/summary', [PenilaianKaryawanController::class, 'getSummary'])->name('penilaian_karyawan.summary');
+    Route::get('/export', [PenilaianKaryawanController::class, 'export'])->name('penilaian_karyawan.export');
+    Route::get('/ranking', [PenilaianKaryawanController::class, 'ranking'])->name('penilaian_karyawan.ranking');
+    Route::get('/saw-details', [PenilaianKaryawanController::class, 'getSAWDetails'])->name('penilaian_karyawan.saw-details');
+    Route::get('/criteria-stats', [PenilaianKaryawanController::class, 'getCriteriaStats'])->name('penilaian_karyawan.criteria-stats');
+    Route::get('/{employee}/create', [PenilaianKaryawanController::class, 'create'])->name('penilaian_karyawan.create');
+    Route::get('/{employee}/edit', [PenilaianKaryawanController::class, 'edit'])->name('penilaian_karyawan.edit');
+    Route::get('/{employee}/show', [PenilaianKaryawanController::class, 'show'])->name('penilaian_karyawan.show');
+    Route::post('/store', [PenilaianKaryawanController::class, 'store'])->name('penilaian_karyawan.store');
+    Route::delete('/{assessment}', [PenilaianKaryawanController::class, 'destroy'])->name('penilaian_karyawan.destroy');
+    Route::delete('/bulk-delete', [PenilaianKaryawanController::class, 'bulkDelete'])->name('penilaian_karyawan.bulk-delete');
 });
 
 // Results viewing routes - accessible by Admin and Pemimpin Perusahaan
 Route::middleware(['auth'])->group(function () {
-    Route::get('/results', [App\Http\Controllers\EmployeeScoringController::class, 'results'])->name('results.index');
-    Route::get('/results/ranking', [App\Http\Controllers\EmployeeScoringController::class, 'resultsRanking'])->name('results.ranking');
-    Route::get('/results/export', [App\Http\Controllers\EmployeeScoringController::class, 'resultsExport'])->name('results.export');
-    Route::get('/results/summary', [App\Http\Controllers\EmployeeScoringController::class, 'getResultsSummary'])->name('results.summary');
-    Route::get('/results/saw-details', [App\Http\Controllers\EmployeeScoringController::class, 'getSAWDetails'])->name('results.saw-details');
-    Route::get('/results/{employee}/show', [App\Http\Controllers\EmployeeScoringController::class, 'resultsShow'])->name('results.show');
+    Route::get('/results', [PenilaianKaryawanController::class, 'results'])->name('results.index');
+    Route::get('/results/ranking', [PenilaianKaryawanController::class, 'resultsRanking'])->name('results.ranking');
+    Route::get('/results/export', [PenilaianKaryawanController::class, 'resultsExport'])->name('results.export');
+    Route::get('/results/summary', [PenilaianKaryawanController::class, 'getResultsSummary'])->name('results.summary');
+    Route::get('/results/saw-details', [PenilaianKaryawanController::class, 'getSAWDetails'])->name('results.saw-details');
+    Route::get('/results/{employee}/show', [PenilaianKaryawanController::class, 'resultsShow'])->name('results.show');
 });
 
 // Approval routes - accessible by leadership roles

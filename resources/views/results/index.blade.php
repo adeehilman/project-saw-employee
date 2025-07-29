@@ -5,6 +5,7 @@
     <link rel="stylesheet" media="screen, print" href="/admin/css/theme-demo.css">
     <link rel="stylesheet" media="screen, print" href="/admin/css/notifications/toastr/toastr.css">
     <link rel="stylesheet" media="screen, print" href="/admin/css/datagrid/datatables/datatables.bundle.css">
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
 @endsection
 @section('pages-content')
     <main id="js-page-content" role="main" class="page-content">
@@ -21,21 +22,19 @@
             @endcomponent
         </div>
 
-        <!-- Period Selection -->
+        <!-- Date Range Selection -->
         <div class="row mb-3">
             <div class="col-md-6">
                 <div class="form-group">
-                    <label for="period-select">Periode Penilaian:</label>
-                    <select id="period-select" class="form-control">
-                        <option value="{{ now()->format('Y-m-01') }}" {{ $currentPeriod == now()->format('Y-m-01') ? 'selected' : '' }}>
-                            {{ now()->format('F Y') }} (Bulan Ini)
-                        </option>
-                        @foreach($availablePeriods as $period)
-                            <option value="{{ $period['value'] }}" {{ $currentPeriod == $period['value'] ? 'selected' : '' }}>
-                                {{ $period['label'] }}
-                            </option>
-                        @endforeach
-                    </select>
+                    <label for="waktu-penilaian-range">Waktu Penilaian:</label>
+                    <div class="input-group">
+                        <input type="text" id="waktu-penilaian-range" class="form-control" readonly>
+                        <div class="input-group-append">
+                            <span class="input-group-text">
+                                <i class="fal fa-calendar-alt"></i>
+                            </span>
+                        </div>
+                    </div>
                 </div>
             </div>
             <div class="col-md-6">
@@ -126,7 +125,7 @@
                         <span class="badge badge-success">{{ $approvedCriteria->count() }} Kriteria Disetujui</span>
                         @if($sawValidation['can_calculate'])
                             <span class="badge badge-info ml-2">SAW Ready</span>
-                            <a href="{{ route('results.ranking', ['period' => $currentPeriod]) }}" class="btn btn-primary btn-sm ml-2">
+                            <a href="{{ route('results.ranking', ['start_date' => $startDate, 'end_date' => $endDate]) }}" class="btn btn-primary btn-sm ml-2">
                                 <i class="fal fa-trophy"></i> Lihat Ranking SAW
                             </a>
                         @else
@@ -208,7 +207,7 @@
                                     @endif
                                 </td>
                                 <td>
-                                    <a href="{{ route('results.show', ['employee' => $employee->id_karyawan, 'period' => $currentPeriod]) }}" 
+                                    <a href="{{ route('results.show', ['employee' => $employee->id_karyawan, 'start_date' => $startDate, 'end_date' => $endDate]) }}"
                                        class="btn btn-info btn-sm">
                                         <i class="fal fa-eye"></i> Detail
                                     </a>
@@ -254,13 +253,13 @@
                         </div>
                         
                         <div class="form-group">
-                            <label for="export-period">Periode:</label>
-                            <select id="export-period" class="form-control">
-                                <option value="{{ $currentPeriod }}">{{ \Carbon\Carbon::parse($currentPeriod)->format('F Y') }} (Saat Ini)</option>
-                                @foreach($availablePeriods as $period)
-                                    <option value="{{ $period['value'] }}">{{ $period['label'] }}</option>
-                                @endforeach
-                            </select>
+                            <label for="export-start-date">Tanggal Mulai:</label>
+                            <input type="date" id="export-start-date" class="form-control" value="{{ $startDate }}">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="export-end-date">Tanggal Akhir:</label>
+                            <input type="date" id="export-end-date" class="form-control" value="{{ $endDate }}">
                         </div>
                         
                         <div class="alert alert-info">
@@ -286,6 +285,8 @@
 
 @section('pages-script')
     <script src="/admin/js/datagrid/datatables/datatables.bundle.js"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
     <script>
         $(document).ready(function() {
             // Initialize DataTable
@@ -294,21 +295,49 @@
                 order: [[0, 'asc']] // Sort by rank
             });
 
+            // Initialize daterangepicker
+            $('#waktu-penilaian-range').daterangepicker({
+                startDate: moment('{{ $startDate }}'),
+                endDate: moment('{{ $endDate }}'),
+                locale: {
+                    format: 'DD/MM/YYYY',
+                    separator: ' - ',
+                    applyLabel: 'Terapkan',
+                    cancelLabel: 'Batal',
+                    fromLabel: 'Dari',
+                    toLabel: 'Sampai',
+                    customRangeLabel: 'Kustom',
+                    weekLabel: 'M',
+                    daysOfWeek: ['Min', 'Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab'],
+                    monthNames: ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
+                        'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'],
+                    firstDay: 1
+                },
+                ranges: {
+                    'Bulan Ini': [moment().startOf('month'), moment().endOf('month')],
+                    'Bulan Lalu': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')],
+                    '3 Bulan Terakhir': [moment().subtract(3, 'month').startOf('month'), moment().endOf('month')],
+                    '6 Bulan Terakhir': [moment().subtract(6, 'month').startOf('month'), moment().endOf('month')],
+                    'Tahun Ini': [moment().startOf('year'), moment().endOf('year')]
+                }
+            }, function(start, end, label) {
+                // When date range changes, reload the page with new parameters
+                const startDate = start.format('YYYY-MM-DD');
+                const endDate = end.format('YYYY-MM-DD');
+                window.location.href = `{{ route('results.index') }}?start_date=${startDate}&end_date=${endDate}`;
+            });
+
             // Load summary on page load
             loadSummary();
         });
 
-        // Period selection change
-        $('#period-select').change(function() {
-            const selectedPeriod = $(this).val();
-            window.location.href = `{{ route('results.index') }}?period=${selectedPeriod}`;
-        });
-
         // Load summary statistics
         function loadSummary() {
-            const period = $('#period-select').val();
-            
-            $.get(`{{ route('results.summary') }}?period=${period}`)
+            const dateRange = $('#waktu-penilaian-range').data('daterangepicker');
+            const startDate = dateRange ? dateRange.startDate.format('YYYY-MM-DD') : '{{ $startDate }}';
+            const endDate = dateRange ? dateRange.endDate.format('YYYY-MM-DD') : '{{ $endDate }}';
+
+            $.get(`{{ route('results.summary') }}?start_date=${startDate}&end_date=${endDate}`)
                 .done(function(data) {
                     $('#total-employees').text(data.total_employees);
                     $('#assessed-employees').text(data.assessed_employees);
@@ -323,9 +352,10 @@
 
         // Export data with format
         function exportData(format = 'excel') {
-            const period = $('#period-select').val();
-            const url = `{{ route('results.export') }}?period=${period}&format=${format}`;
-            
+            const startDate = '{{ $startDate }}';
+            const endDate = '{{ $endDate }}';
+            const url = `{{ route('results.export') }}?start_date=${startDate}&end_date=${endDate}&format=${format}`;
+
             // Create temporary link and trigger download
             const link = document.createElement('a');
             link.href = url;
@@ -337,16 +367,18 @@
 
         // Show export modal
         function showExportModal() {
-            $('#export-period').val($('#period-select').val());
+            $('#export-start-date').val('{{ $startDate }}');
+            $('#export-end-date').val('{{ $endDate }}');
             $('#exportModal').modal('show');
         }
 
         // Process export from modal
         function processExport() {
             const format = $('#export-format').val();
-            const period = $('#export-period').val();
-            
-            let url = `{{ route('results.export') }}?period=${period}&format=${format}`;
+            const startDate = $('#export-start-date').val();
+            const endDate = $('#export-end-date').val();
+
+            let url = `{{ route('results.export') }}?start_date=${startDate}&end_date=${endDate}&format=${format}`;
             
             // Show loading
             const btn = event.target;

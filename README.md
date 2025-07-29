@@ -116,9 +116,32 @@ php artisan db:seed
 ### Multi User
 Role : <br>
 - Admin : abdulmadjid@gmail.com/password <br>
+- Pemimpin Perusahaan : direktur@perusahaan.com/password <br>
 - Wali Kelas : tabiin@gmail.com/password <br>
 - Guru Mapel : adelina@gmail.com/password <br>
 - Siswa : ikbara@gmail.com/password <br>
+
+### Approval System
+Sistem persetujuan kriteria dan bobot penilaian:
+- **Pemimpin Perusahaan**: direktur@perusahaan.com/password
+- **Manajer Operasional**: manajer@perusahaan.com/password
+- **Manajer SDM**: hr@perusahaan.com/password
+
+### Employee Scoring System with SAW Method
+Sistem penilaian karyawan menggunakan metode SAW (Simple Additive Weighting):
+- **Admin dapat memasukkan nilai karyawan** (0-100) untuk setiap kriteria
+- **Perhitungan SAW otomatis** dengan normalisasi dan bobot kriteria
+- **Ranking objektif** berdasarkan skor SAW tertinggi
+- **Dashboard penilaian** dengan statistik dan filter periode
+- **Visualisasi grafik** penilaian per kriteria
+- **Detail perhitungan SAW** dengan breakdown normalisasi
+
+#### Langkah-langkah SAW:
+1. **Menentukan bobot** untuk setiap kriteria (oleh Pemimpin Perusahaan)
+2. **Penilaian karyawan** pada skala 0-100 (oleh Admin)
+3. **Normalisasi matriks** berdasarkan nilai tertinggi per kriteria
+4. **Menghitung skor akhir** dengan formula: V_i = Σ(w_j × r_ij)
+5. **Hasil perangkingan** berdasarkan skor SAW tertinggi
 
 ### User Access
 The access used is to sort roles, by filtering the submenu section with the following script:

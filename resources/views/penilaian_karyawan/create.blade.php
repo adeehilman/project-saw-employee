@@ -56,16 +56,16 @@
             @endcomponent
         </div>
 
-        <form action="{{ route('scoring.store') }}" method="POST" id="scoringForm">
+        <form action="{{ route('penilaian_karyawan.store') }}" method="POST" id="scoringForm">
             @csrf
             <input type="hidden" name="id_karyawan" value="{{ $employee->id_karyawan }}">
-            <input type="hidden" name="periode_penilaian" value="{{ $period }}">
+            <input type="hidden" name="waktu_penilaian" value="{{ now()->format('Y-m-d') }}">
 
             <!-- Employee Info -->
             <x-panel.show title="Informasi Karyawan" subtitle="Data karyawan yang akan dinilai">
                 <x-slot name="paneltoolbar">
                     <x-panel.tool-bar>
-                        <a href="{{ route('scoring.index', ['period' => $period]) }}" class="btn btn-secondary btn-sm">
+                        <a href="{{ route('penilaian_karyawan.index', ['start_date' => $startDate, 'end_date' => $endDate]) }}" class="btn btn-secondary btn-sm">
                             <i class="fal fa-arrow-left"></i> Kembali
                         </a>
                     </x-panel.tool-bar>
@@ -100,7 +100,7 @@
                             </tr>
                             <tr>
                                 <td><strong>Periode Penilaian:</strong></td>
-                                <td><strong>{{ \Carbon\Carbon::parse($period)->format('F Y') }}</strong></td>
+                                <td><strong>{{ \Carbon\Carbon::parse($startDate)->format('d/m/Y') }} - {{ \Carbon\Carbon::parse($endDate)->format('d/m/Y') }}</strong></td>
                             </tr>
                         </table>
                     </div>
@@ -201,7 +201,7 @@
 
                     <x-slot name="panelcontentfoot">
                         <div class="d-flex justify-content-between">
-                            <a href="{{ route('scoring.index', ['period' => $period]) }}" class="btn btn-secondary">
+                            <a href="{{ route('penilaian_karyawan.index', ['start_date' => $startDate, 'end_date' => $endDate]) }}" class="btn btn-secondary">
                                 <i class="fal fa-times"></i> Batal
                             </a>
                             <button type="submit" class="btn btn-primary btn-lg">

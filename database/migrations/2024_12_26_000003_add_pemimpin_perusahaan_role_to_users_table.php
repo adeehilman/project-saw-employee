@@ -13,7 +13,7 @@ return new class extends Migration
     public function up(): void
     {
         // Add 'Pemimpin Perusahaan' to the existing role enum
-        DB::statement("ALTER TABLE users MODIFY COLUMN role ENUM('Admin', 'Kepala Sekolah', 'Guru Mapel', 'Wali Kelas', 'Kepala Prodi', 'BPBK', 'Tata Usaha', 'Siswa', 'Pengguna', 'Pemimpin Perusahaan', 'Karyawan') DEFAULT 'Pengguna'");
+        DB::statement("ALTER TABLE users MODIFY COLUMN role ENUM('Admin','Pemimpin Perusahaan', 'Karyawan') DEFAULT 'Karyawan'");
     }
 
     /**
@@ -22,6 +22,6 @@ return new class extends Migration
     public function down(): void
     {
         // Remove 'Pemimpin Perusahaan' from the role enum
-        DB::statement("ALTER TABLE users MODIFY COLUMN role ENUM('Admin', 'Kepala Sekolah', 'Guru Mapel', 'Wali Kelas', 'Kepala Prodi', 'BPBK', 'Tata Usaha', 'Siswa', 'Pengguna') DEFAULT 'Pengguna'");
+        DB::statement("ALTER TABLE users MODIFY COLUMN role ENUM('Admin','Pemimpin Perusahaan', 'Karyawan') DEFAULT 'Karyawan'");
     }
 };

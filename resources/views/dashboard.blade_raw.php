@@ -105,27 +105,6 @@
         <div class="fs-lg fw-300 p-5 bg-white border-faded rounded mb-g shadow-5">
 
             <x-col :size1="4" :size2="8">
-                <x-slot name='content1'>
-                    <div id="panel-5" class="panel">
-                        <div class="panel-hdr">
-                            <h2>Subscriptions Hourly</h2>
-                        </div>
-                        <div class="panel-container show">
-                            <div class="panel-content p-0">
-                                <div class="d-flex flex-column">
-                                    <div class="d-flex flex-row px-3 pt-3 pb-2">
-                                        @if ($tahunAjaranAktif)
-                                            <p>Tahun Ajaran Aktif: {{ $tahunAjaranAktif->tahunajaran }}</p>
-                                            <p>Semester: {{ $tahunAjaranAktif->semester }}</p>
-                                        @else
-                                            <p>Tidak ada tahun ajaran aktif saat ini.</p>
-                                        @endif
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </x-slot>
                 <x-slot name='content2'>
                     <div id="panel-2" class="panel" data-panel-fullscreen="false">
                         <div class="panel-hdr">

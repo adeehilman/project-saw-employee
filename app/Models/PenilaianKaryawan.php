@@ -19,14 +19,14 @@ class PenilaianKaryawan extends Model
         'id_penilaian',
         'id_kriteria_bobot',
         'id_karyawan',
-        'periode_penilaian',
+        'waktu_penilaian',
         'nilai',
         'catatan',
         'dinilai_oleh'
     ];
 
     protected $casts = [
-        'periode_penilaian' => 'date',
+        'waktu_penilaian' => 'date',
         'nilai' => 'decimal:2'
     ];
 
@@ -63,27 +63,28 @@ class PenilaianKaryawan extends Model
         return 'PNL' . str_pad($count, 6, '0', STR_PAD_LEFT);
     }
 
+
+
     /**
-     * Get assessments for a specific employee and period
+     * Get assessments for a specific employee and date range
      */
-    public static function getEmployeeAssessments($employeeId, $period = null)
+    public static function getEmployeeAssessmentsForDateRange($employeeId, $startDate, $endDate)
     {
-        $query = static::where('id_karyawan', $employeeId)
-            ->with(['kriteriaBobot', 'penilai']);
-
-        if ($period) {
-            $query->where('periode_penilaian', $period);
-        }
-
-        return $query->orderBy('periode_penilaian', 'desc')->get();
+        return static::where('id_karyawan', $employeeId)
+            ->whereBetween('waktu_penilaian', [$startDate, $endDate])
+            ->with(['kriteriaBobot', 'penilai'])
+            ->orderBy('waktu_penilaian', 'desc')
+            ->get();
     }
 
+
+
     /**
-     * Get all assessments for a specific period
+     * Get all assessments for a date range
      */
-    public static function getPeriodAssessments($period)
+    public static function getDateRangeAssessments($startDate, $endDate)
     {
-        return static::where('periode_penilaian', $period)
+        return static::whereBetween('waktu_penilaian', [$startDate, $endDate])
             ->with(['karyawan', 'kriteriaBobot', 'penilai'])
             ->get();
     }
@@ -91,42 +92,28 @@ class PenilaianKaryawan extends Model
 
 
     /**
-     * Calculate SAW score for an employee in a period
+     * Calculate SAW score for an employee in a date range
      */
-    public static function calculateSAWScore($employeeId, $period)
+    public static function calculateSAWScore($employeeId, $startDate, $endDate)
     {
         $sawService = app(\App\Services\SAWCalculationService::class);
-        $employeeDetails = $sawService->getEmployeeSAWDetails($employeeId, $period);
+        $employeeDetails = $sawService->getEmployeeSAWDetails($employeeId, $startDate, $endDate);
 
         return $employeeDetails ? $employeeDetails['saw_score_percentage'] : 0;
     }
 
     /**
-     * Get SAW ranking for an employee in a period
+     * Get SAW ranking for an employee in a date range
      */
-    public static function getEmployeeRank($employeeId, $period)
+    public static function getEmployeeRank($employeeId, $startDate, $endDate)
     {
         $sawService = app(\App\Services\SAWCalculationService::class);
-        $employeeDetails = $sawService->getEmployeeSAWDetails($employeeId, $period);
+        $employeeDetails = $sawService->getEmployeeSAWDetails($employeeId, $startDate, $endDate);
 
         return $employeeDetails ? $employeeDetails['rank'] : null;
     }
 
-    /**
-     * Get available assessment periods
-     */
-    public static function getAvailablePeriods()
-    {
-        return static::selectRaw('DISTINCT periode_penilaian')
-            ->orderBy('periode_penilaian', 'desc')
-            ->pluck('periode_penilaian')
-            ->map(function ($date) {
-                return [
-                    'value' => $date,
-                    'label' => \Carbon\Carbon::parse($date)->format('F Y')
-                ];
-            });
-    }
+
 
 
 }

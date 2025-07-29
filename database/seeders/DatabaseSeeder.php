@@ -22,13 +22,11 @@ class DatabaseSeeder extends Seeder
         $this->call([
             AppFiturSeeder::class,
             AppProfileSeeder::class,
-            TahunAjaranSeeder::class,
             UserSeeder::class,
             PemimpinPerusahaanSeeder::class,
             OpsiLoginSeeder::class,
             BidangKeahlianSeeder::class,
             ProgramKeahlianSeeder::class,
-            ProfilSekolahSeeder::class,
             DataGuruSeeder::class,
         ]);
     }

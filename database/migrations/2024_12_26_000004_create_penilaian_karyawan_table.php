@@ -18,7 +18,7 @@ return new class extends Migration
             $table->string('id_penilaian', 20)->primary();
             $table->unsignedBigInteger('id_kriteria_bobot');
             $table->unsignedInteger('id_karyawan');
-            $table->date('periode_penilaian'); // Periode penilaian (bulan/tahun)
+            $table->date('waktu_penilaian'); // Waktu penilaian
             $table->decimal('nilai', 5, 2); // Nilai dengan 2 desimal (0.00 - 100.00)
             $table->text('catatan')->nullable(); // Catatan penilaian
             $table->unsignedBigInteger('dinilai_oleh'); // User yang memberikan nilai
@@ -29,10 +29,10 @@ return new class extends Migration
             $table->foreign('dinilai_oleh')->references('id')->on('users')->onDelete('cascade');
             
             // Unique constraint to prevent duplicate scoring for same employee-criteria-period
-            $table->unique(['id_kriteria_bobot', 'id_karyawan', 'periode_penilaian'], 'unique_employee_criteria_period');
+            $table->unique(['id_kriteria_bobot', 'id_karyawan', 'waktu_penilaian'], 'unique_employee_criteria_period');
             
             // Indexes for better performance
-            $table->index('periode_penilaian');
+            $table->index('waktu_penilaian');
             $table->index('dinilai_oleh');
         });
     }
