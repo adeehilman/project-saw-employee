@@ -48,6 +48,7 @@
 
 {{-- after --}}
 {{-- TODO: Delete the comment if not needed --}}
+@if(auth()->user()->role == 'Admin')
 <li class="{{ Request::is('karyawan/*') ? 'active open' : '' }}">
     <a href="#" title="Karyawan" data-filter-tags="Karyawan">
         <i class="fal fa-briefcase"></i>
@@ -62,6 +63,7 @@
         </li>
     </ul>
 </li>
+@endif
 
 <li class="{{ Request::is('penilaian/*') ? 'active open' : '' }}">
     <a href="#" title="Penilaian" data-filter-tags="Penilaian">
@@ -75,29 +77,25 @@
                 <span class="nav-link-text" data-i18n="nav.kriteria_dan_penilaian">Kriteria dan Bobot Penilaian</span>
             </a>
         </li>
-        @if(auth()->user()->role == 'Admin')
-        <li class="{{ Request::is('scoring*') ? 'active' : '' }}">
-            <a href="{{ route('penilaian_karyawan.index') }}" title="Penilaian Karyawan"
-                data-filter-tags="penilaian karyawan nilai">
-                <span class="nav-link-text" data-i18n="nav.penilaian_karyawan_scoring">Penilaian Karyawan</span>
-            </a>
-        </li>
-        @endif
-        @if(auth()->user()->role == 'Pemimpin Perusahaan' || auth()->user()->role == 'Admin')
-        <li class="{{ Request::is('results*') ? 'active' : '' }}">
+        @if(auth()->user()->role == 'Karyawan')
+        <li class="{{ Request::is('hasil_penilaian*') ? 'active' : '' }}">
             <a href="{{ route('results.index') }}" title="Hasil Penilaian"
                 data-filter-tags="hasil penilaian ranking saw">
                 <span class="nav-link-text" data-i18n="nav.hasil_penilaian">Hasil Penilaian</span>
             </a>
         </li>
         @endif
-        @if(auth()->user()->role == 'Pemimpin Perusahaan' || auth()->user()->role == 'Admin')
-        <li class="{{ Request::is('approval*') ? 'active' : '' }}">
-            <a href="{{ route('approval.index') }}" title="Persetujuan Kriteria"
-                data-filter-tags="persetujuan approval kriteria">
-                <span class="nav-link-text" data-i18n="nav.approval_dashboard">Persetujuan Kriteria</span>
+         @if(auth()->user()->role == 'Admin')
+        <li class="{{ Request::is('penilaian_karyawan*') ? 'active' : '' }}">
+            <a href="{{ route('penilaian_karyawan.index') }}" title="Penilaian Karyawan"
+                data-filter-tags="penilaian karyawan nilai">
+                <span class="nav-link-text" data-i18n="nav.penilaian_karyawan_scoring">Penilaian Karyawan</span>
             </a>
         </li>
+        @endif
+
+        @if (auth()->user()->role == 'Pemimpin Perusahaan')
+            @include('inc.mainmenu._menu_pemimpinperusahaan')
         @endif
     </ul>
 </li>

@@ -9,12 +9,6 @@
     @if (auth()->user()->role == 'Admin' || auth()->user()->role == 'Pemimpin Perusahaan')
         @include('inc.mainmenu._menu_master')
     @endif
-    @if (auth()->user()->role == 'Wali Kelas')
-        @include('inc.mainmenu._menu_walikelas')
-    @endif
-    @if (auth()->user()->role == 'Guru Mapel')
-        @include('inc.mainmenu._menu_gurumapel')
-    @endif
     <div class="m-0 w-100 p-2"></div>
     <li class="{{ Request::is('about') ? 'active' : '' }}">
         <a href="/about" title="About" data-filter-tags="application about">

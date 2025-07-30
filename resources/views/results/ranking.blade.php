@@ -333,9 +333,18 @@
             });
 
             // Initialize daterangepicker
+            var startDate = '{{ $startDate }}';
+            var endDate = '{{ $endDate }}';
+
+            // Set default dates if not provided
+            if (!startDate || !endDate) {
+                startDate = moment().startOf('month').format('YYYY-MM-DD');
+                endDate = moment().endOf('month').format('YYYY-MM-DD');
+            }
+
             $('#waktu-penilaian-range').daterangepicker({
-                startDate: moment('{{ $startDate }}'),
-                endDate: moment('{{ $endDate }}'),
+                startDate: moment(startDate),
+                endDate: moment(endDate),
                 locale: {
                     format: 'DD/MM/YYYY',
                     separator: ' - ',

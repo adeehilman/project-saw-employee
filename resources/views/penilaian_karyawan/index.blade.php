@@ -354,9 +354,18 @@
             });
 
             // Initialize daterangepicker
+            var startDate = '{{ $startDate }}';
+            var endDate = '{{ $endDate }}';
+
+            // Set default dates if not provided
+            if (!startDate || !endDate) {
+                startDate = moment().startOf('month').format('YYYY-MM-DD');
+                endDate = moment().endOf('month').format('YYYY-MM-DD');
+            }
+
             $('#waktu-penilaian-range').daterangepicker({
-                startDate: moment('{{ $startDate }}'),
-                endDate: moment('{{ $endDate }}'),
+                startDate: moment(startDate),
+                endDate: moment(endDate),
                 locale: {
                     format: 'DD/MM/YYYY',
                     separator: ' - ',
@@ -392,10 +401,16 @@
         // Load summary statistics
         function loadSummary() {
             const dateRange = $('#waktu-penilaian-range').data('daterangepicker');
-            const startDate = dateRange ? dateRange.startDate.format('YYYY-MM-DD') : '{{ $startDate }}';
-            const endDate = dateRange ? dateRange.endDate.format('YYYY-MM-DD') : '{{ $endDate }}';
+            let startDate = dateRange ? dateRange.startDate.format('YYYY-MM-DD') : '{{ $startDate }}';
+            let endDate = dateRange ? dateRange.endDate.format('YYYY-MM-DD') : '{{ $endDate }}';
 
-            $.get(`{{ route('penilaian_karyawan.summary') }}?start_date=${startDate}&end_date=${endDate}`)
+            // Build URL with parameters only if dates are provided
+            let url = '{{ route('penilaian_karyawan.summary') }}';
+            if (startDate && endDate) {
+                url += `?start_date=${startDate}&end_date=${endDate}`;
+            }
+
+            $.get(url)
                 .done(function(data) {
                     $('#total-employees').text(data.total_employees);
                     $('#assessed-employees').text(data.assessed_employees);
@@ -412,7 +427,11 @@
         function exportData(format = 'excel') {
             const startDate = '{{ $startDate }}';
             const endDate = '{{ $endDate }}';
-            const url = `{{ route('penilaian_karyawan.export') }}?start_date=${startDate}&end_date=${endDate}&format=${format}`;
+
+            let url = `{{ route('penilaian_karyawan.export') }}?format=${format}`;
+            if (startDate && endDate) {
+                url += `&start_date=${startDate}&end_date=${endDate}`;
+            }
 
             // Create temporary link and trigger download
             const link = document.createElement('a');
@@ -425,13 +444,23 @@
 
         // Show export modal
         function showExportModal() {
-            $('#export-start-date').val('{{ $startDate }}');
-            $('#export-end-date').val('{{ $endDate }}');
+            const startDate = '{{ $startDate }}';
+            const endDate = '{{ $endDate }}';
+
+            if (startDate && endDate) {
+                $('#export-start-date').val(startDate);
+                $('#export-end-date').val(endDate);
+            } else {
+                // Set current month as default
+                $('#export-start-date').val(moment().startOf('month').format('YYYY-MM-DD'));
+                $('#export-end-date').val(moment().endOf('month').format('YYYY-MM-DD'));
+            }
             $('#exportModal').modal('show');
         }
 
         // Process export from modal
         function processExport() {
+            // Get form values
             const format = $('#export-format').val();
             const startDate = $('#export-start-date').val();
             const endDate = $('#export-end-date').val();
@@ -439,37 +468,39 @@
             const includeBreakdown = $('#include-breakdown').is(':checked');
             const includeStats = $('#include-stats').is(':checked');
 
-            let url = `{{ route('penilaian_karyawan.export') }}?start_date=${startDate}&end_date=${endDate}&format=${format}`;
+            // Build URL
+            let url = `{{ route('penilaian_karyawan.export') }}?format=${format}`;
 
-            if (!includeRanking) url += '&exclude_ranking=1';
-            if (!includeBreakdown) url += '&exclude_breakdown=1';
-            if (!includeStats) url += '&exclude_stats=1';
+            if (startDate && endDate) {
+                url += `&start_date=${startDate}&end_date=${endDate}`;
+            }
 
-            // Show loading
-            const btn = event.target;
-            const originalText = btn.innerHTML;
+            if (!includeRanking) {
+                url += '&exclude_ranking=1';
+            }
+            if (!includeBreakdown) {
+                url += '&exclude_breakdown=1';
+            }
+            if (!includeStats) {
+                url += '&exclude_stats=1';
+            }
+
             btn.innerHTML = '<i class="fal fa-spinner fa-spin"></i> Mengunduh...';
             btn.disabled = true;
-
-            // Create download link
-            const link = document.createElement('a');
-            link.href = url;
-            link.download = '';
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-
-            // Reset button after delay
-            setTimeout(() => {
-                btn.innerHTML = originalText;
-                btn.disabled = false;
-                $('#exportModal').modal('hide');
-            }, 2000);
         }
 
         // Confirm delete assessments
         function confirmDeleteAssessments(employeeId, employeeName) {
-            $('#deleteMessage').text(`Anda akan menghapus semua penilaian untuk karyawan "${employeeName}" pada rentang tanggal ini. Tindakan ini tidak dapat dibatalkan.`);
+            const startDate = '{{ $startDate }}';
+            const endDate = '{{ $endDate }}';
+
+            let message = `Anda akan menghapus semua penilaian untuk karyawan "${employeeName}"`;
+            if (startDate && endDate) {
+                message += ` pada rentang tanggal ini`;
+            }
+            message += `. Tindakan ini tidak dapat dibatalkan.`;
+
+            $('#deleteMessage').text(message);
             $('#deleteForm').attr('action', `{{ route('penilaian_karyawan.bulk-delete') }}`);
 
             // Add hidden inputs
@@ -477,8 +508,10 @@
             $('#deleteForm').find('input[name="end_date"]').remove();
             $('#deleteForm').find('input[name="employee_ids[]"]').remove();
 
-            $('#deleteForm').append(`<input type="hidden" name="start_date" value="{{ $startDate }}">`);
-            $('#deleteForm').append(`<input type="hidden" name="end_date" value="{{ $endDate }}">`);
+            if (startDate && endDate) {
+                $('#deleteForm').append(`<input type="hidden" name="start_date" value="${startDate}">`);
+                $('#deleteForm').append(`<input type="hidden" name="end_date" value="${endDate}">`);
+            }
             $('#deleteForm').append(`<input type="hidden" name="employee_ids[]" value="${employeeId}">`);
 
             $('#deleteModal').modal('show');

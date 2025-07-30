@@ -27,7 +27,7 @@ class ApprovalMiddleware
 
         // Check if user has leadership role for approval functions
         if (!in_array($user->role, $leadershipRoles)) {
-            abort(403, 'Akses ditolak. Hanya Pemimpin Perusahaan dan Admin yang dapat mengakses fungsi persetujuan.');
+            abort(403, 'Akses ditolak. Hanya Pemimpin Perusahaan yang dapat mengakses fungsi persetujuan.');
         }
 
         return $next($request);

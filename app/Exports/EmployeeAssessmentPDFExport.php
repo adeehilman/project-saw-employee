@@ -163,7 +163,7 @@ class EmployeeAssessmentPDFExport implements FromCollection, WithHeadings, WithM
                 }
 
                 // Add title and metadata at the top
-                $sheet->insertNewRowBefore(1, 6);
+                $sheet->insertNewRowBefore(1, 5);
                 
                 // Main title
                 $sheet->setCellValue('A1', 'HASIL PENILAIAN KARYAWAN');
@@ -182,7 +182,6 @@ class EmployeeAssessmentPDFExport implements FromCollection, WithHeadings, WithM
                 ]);
 
                 // Period and date info
-                $sheet->setCellValue('A3', 'Periode: ' . Carbon::parse($this->period)->format('F Y'));
                 $sheet->setCellValue('A4', 'Tanggal Export: ' . now()->format('d/m/Y H:i:s'));
                 $sheet->setCellValue('A5', 'Metode: SAW (Simple Additive Weighting)');
 
@@ -207,4 +206,6 @@ class EmployeeAssessmentPDFExport implements FromCollection, WithHeadings, WithM
             }
         ];
     }
+
+
 }

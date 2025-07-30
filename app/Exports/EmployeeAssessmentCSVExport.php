@@ -37,7 +37,7 @@ class EmployeeAssessmentCSVExport implements FromCollection, WithHeadings, WithM
             'Jenis Kelamin',
             'Tanggal Masuk',
             'Skor SAW (%)',
-            'Periode'
+            'Waktu Penilaian Karyawan'
         ];
 
         // Add individual criteria headers
@@ -61,7 +61,7 @@ class EmployeeAssessmentCSVExport implements FromCollection, WithHeadings, WithM
             $employee->jenis_kelamin,
             Carbon::parse($employee->tanggal_masuk)->format('d/m/Y'),
             number_format($result['saw_score_percentage'], 2),
-            Carbon::parse($this->period)->format('F Y')
+            $result['waktu_penilaian_karyawan'] ?? '-'
         ];
 
         // Add individual criteria scores
@@ -92,4 +92,6 @@ class EmployeeAssessmentCSVExport implements FromCollection, WithHeadings, WithM
             },
         ];
     }
+
+
 }

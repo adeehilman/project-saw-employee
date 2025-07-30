@@ -25,9 +25,29 @@ class PenilaianKaryawanController extends Controller
         $startDate = $request->get('start_date');
         $endDate = $request->get('end_date');
 
+        // Check if dates are provided and valid
+        $hasValidDates = false;
+        if ($startDate && $endDate && $this->isValidDate($startDate) && $this->isValidDate($endDate)) {
+            $hasValidDates = true;
+            // Ensure start date is not after end date
+            if ($startDate > $endDate) {
+                $temp = $startDate;
+                $startDate = $endDate;
+                $endDate = $temp;
+            }
+        } else {
+            // Set default values for display purposes only
+            $startDate = null;
+            $endDate = null;
+        }
+
+        // Load employees with conditional date filtering
         $employees = DataKaryawan::where('is_active', true)
-            ->with(['penilaian' => function($query) use ($startDate, $endDate) {
-                $query->whereBetween('waktu_penilaian', [$startDate, $endDate]);
+            ->with(['penilaian' => function($query) use ($startDate, $endDate, $hasValidDates) {
+                if ($hasValidDates) {
+                    $query->whereBetween('waktu_penilaian', [$startDate, $endDate]);
+                }
+                // If no valid dates, load all penilaian data
             }])
             ->get();
 
@@ -35,8 +55,8 @@ class PenilaianKaryawanController extends Controller
 
         // Calculate SAW scores and rankings
         $sawService = app(SAWCalculationService::class);
-        $sawResults = $sawService->calculateSAWScores($startDate, $endDate);
-        $sawValidation = $sawService->canPerformSAW($startDate, $endDate);
+        $sawResults = $hasValidDates ? $sawService->calculateSAWScores($startDate, $endDate) : $sawService->calculateSAWScores(null, null);
+        $sawValidation = $hasValidDates ? $sawService->canPerformSAW($startDate, $endDate) : $sawService->canPerformSAW(null, null);
 
         return view('penilaian_karyawan.index', compact(
             'employees',
@@ -59,6 +79,15 @@ class PenilaianKaryawanController extends Controller
         $startDate = $request->get('start_date');
         $endDate = $request->get('end_date');
 
+        // Check if dates are provided and valid
+        $hasValidDates = false;
+        if ($startDate && $endDate && $this->isValidDate($startDate) && $this->isValidDate($endDate)) {
+            $hasValidDates = true;
+        } else {
+            $startDate = null;
+            $endDate = null;
+        }
+
         // Get approved criteria
         $approvedCriteria = KriteriaBobot::where('status', 'Disetujui')
             ->orderBy('kriteria')
@@ -70,8 +99,13 @@ class PenilaianKaryawanController extends Controller
         }
 
         // Get existing assessments for this employee and date range
-        $existingAssessments = PenilaianKaryawan::where('id_karyawan', $employeeId)
-            ->whereBetween('waktu_penilaian', [$startDate, $endDate])
+        $existingAssessmentsQuery = PenilaianKaryawan::where('id_karyawan', $employeeId);
+
+        if ($hasValidDates) {
+            $existingAssessmentsQuery->whereBetween('waktu_penilaian', [$startDate, $endDate]);
+        }
+
+        $existingAssessments = $existingAssessmentsQuery
             ->with('kriteriaBobot')
             ->get()
             ->keyBy('id_kriteria_bobot');
@@ -153,8 +187,22 @@ class PenilaianKaryawanController extends Controller
         $startDate = $request->get('start_date');
         $endDate = $request->get('end_date');
 
-        $assessments = PenilaianKaryawan::where('id_karyawan', $employeeId)
-            ->whereBetween('waktu_penilaian', [$startDate, $endDate])
+        // Check if dates are provided and valid
+        $hasValidDates = false;
+        if ($startDate && $endDate && $this->isValidDate($startDate) && $this->isValidDate($endDate)) {
+            $hasValidDates = true;
+        } else {
+            $startDate = null;
+            $endDate = null;
+        }
+
+        $assessmentsQuery = PenilaianKaryawan::where('id_karyawan', $employeeId);
+
+        if ($hasValidDates) {
+            $assessmentsQuery->whereBetween('waktu_penilaian', [$startDate, $endDate]);
+        }
+
+        $assessments = $assessmentsQuery
             ->with(['kriteriaBobot', 'penilai'])
             ->get();
 
@@ -206,22 +254,36 @@ class PenilaianKaryawanController extends Controller
         $startDate = $request->get('start_date');
         $endDate = $request->get('end_date');
 
+        // Check if dates are provided and valid
+        $hasValidDates = $startDate && $endDate && $this->isValidDate($startDate) && $this->isValidDate($endDate);
+
         $totalEmployees = DataKaryawan::where('is_active', true)->count();
-        $assessedEmployees = PenilaianKaryawan::whereBetween('waktu_penilaian', [$startDate, $endDate])
-            ->distinct('id_karyawan')
-            ->count('id_karyawan');
+
+        if ($hasValidDates) {
+            $assessedEmployees = PenilaianKaryawan::whereBetween('waktu_penilaian', [$startDate, $endDate])
+                ->distinct('id_karyawan')
+                ->count('id_karyawan');
+            $totalAssessments = PenilaianKaryawan::whereBetween('waktu_penilaian', [$startDate, $endDate])->count();
+        } else {
+            $assessedEmployees = PenilaianKaryawan::distinct('id_karyawan')
+                ->count('id_karyawan');
+            $totalAssessments = PenilaianKaryawan::count();
+        }
 
         $approvedCriteria = KriteriaBobot::where('status', 'Disetujui')->count();
-        $totalAssessments = PenilaianKaryawan::whereBetween('waktu_penilaian', [$startDate, $endDate])->count();
 
         $completedEmployees = 0;
         if ($approvedCriteria > 0) {
             $employees = DataKaryawan::where('is_active', true)->get();
             foreach ($employees as $employee) {
                 // Check if employee has assessments for all approved criteria
-                $employeeAssessments = PenilaianKaryawan::where('id_karyawan', $employee->id_karyawan)
-                    ->whereBetween('waktu_penilaian', [$startDate, $endDate])
-                    ->count();
+                $employeeAssessmentsQuery = PenilaianKaryawan::where('id_karyawan', $employee->id_karyawan);
+
+                if ($hasValidDates) {
+                    $employeeAssessmentsQuery->whereBetween('waktu_penilaian', [$startDate, $endDate]);
+                }
+
+                $employeeAssessments = $employeeAssessmentsQuery->count();
 
                 if ($employeeAssessments >= $approvedCriteria) {
                     $completedEmployees++;
@@ -248,39 +310,58 @@ class PenilaianKaryawanController extends Controller
         $endDate = $request->get('end_date');
         $format = $request->get('format', 'excel'); // excel, csv, pdf
 
-        // Get SAW results for comprehensive export
-        $sawService = app(SAWCalculationService::class);
-        $sawResults = $sawService->calculateSAWScores($startDate, $endDate);
-        $criteriaStats = $sawService->getCriteriaStatistics($startDate, $endDate);
-        $approvedCriteria = KriteriaBobot::where('status', 'Disetujui')->get();
+        // Check if dates are provided and valid
+        $hasValidDates = $startDate && $endDate && $this->isValidDate($startDate) && $this->isValidDate($endDate);
 
-        $filename = 'hasil_penilaian_' . \Carbon\Carbon::parse($startDate)->format('Y_m_d') . '_to_' . \Carbon\Carbon::parse($endDate)->format('Y_m_d');
+        try {
+            // Get SAW results for comprehensive export
+            $sawService = app(SAWCalculationService::class);
+            $sawResults = $sawService->calculateSAWScores($startDate, $endDate);
 
-        switch ($format) {
-            case 'csv':
-                $csvExport = new EmployeeAssessmentCSVExport($sawResults, $approvedCriteria, $period);
-                return Excel::download($csvExport, $filename . '.csv', \Maatwebsite\Excel\Excel::CSV);
-            case 'pdf':
-                $pdfExport = new EmployeeAssessmentPDFExport($sawResults, $approvedCriteria, $period, $criteriaStats);
-                return Excel::download($pdfExport, $filename . '.pdf', \Maatwebsite\Excel\Excel::DOMPDF);
-            case 'excel':
-            default:
-                $excelExport = new EmployeeAssessmentExport($sawResults, $approvedCriteria, $period, $criteriaStats);
+            $criteriaStats = $sawService->getCriteriaStatistics($startDate, $endDate);
+            $approvedCriteria = KriteriaBobot::where('status', 'Disetujui')->get();
 
-                $response = Excel::download($excelExport, $filename . '.xlsx');
+            // Create filename
+            if ($hasValidDates) {
+                $startFormatted = \Carbon\Carbon::parse($startDate)->format('Y_m_d');
+                $endFormatted = \Carbon\Carbon::parse($endDate)->format('Y_m_d');
+                $filename = 'hasil_penilaian_' . $startFormatted . '_to_' . $endFormatted;
+            } else {
+                $filename = 'hasil_penilaian_all_data_' . now()->format('Y_m_d');
+            }
 
-                // Add explicit headers to prevent browser misinterpretation
-                $response->headers->set('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-                $response->headers->set('Content-Disposition', 'attachment; filename="' . $filename . '.xlsx"');
-                $response->headers->set('Cache-Control', 'max-age=0');
+            // Set period for export classes
+            $period = $hasValidDates ? "$startDate to $endDate" : "All Data";
 
-                return $response;
+            switch ($format) {
+                case 'csv':
+                    $csvExport = new EmployeeAssessmentCSVExport($sawResults, $approvedCriteria, $period);
+                    return Excel::download($csvExport, $filename . '.csv', \Maatwebsite\Excel\Excel::CSV);
+
+                case 'pdf':
+                    $pdfExport = new EmployeeAssessmentPDFExport($sawResults, $approvedCriteria, $period, $criteriaStats);
+                    return Excel::download($pdfExport, $filename . '.pdf', \Maatwebsite\Excel\Excel::DOMPDF);
+
+                case 'excel':
+                default:
+                    $excelExport = new EmployeeAssessmentExport($sawResults, $approvedCriteria, $period, $criteriaStats);
+
+                    $response = Excel::download($excelExport, $filename . '.xlsx');
+
+                    // Add explicit headers to prevent browser misinterpretation
+                    $response->headers->set('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+                    $response->headers->set('Content-Disposition', 'attachment; filename="' . $filename . '.xlsx"');
+                    $response->headers->set('Cache-Control', 'max-age=0');
+
+                    return $response;
+            }
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'error' => 'Export failed: ' . $e->getMessage()
+            ], 500);
         }
     }
-
-
-
-
 
     /**
      * Bulk delete assessments for a date range
@@ -315,6 +396,15 @@ class PenilaianKaryawanController extends Controller
         $startDate = $request->get('start_date');
         $endDate = $request->get('end_date');
 
+        // Check if dates are provided and valid
+        $hasValidDates = false;
+        if ($startDate && $endDate && $this->isValidDate($startDate) && $this->isValidDate($endDate)) {
+            $hasValidDates = true;
+        } else {
+            $startDate = null;
+            $endDate = null;
+        }
+
         $sawService = app(SAWCalculationService::class);
         $sawResults = $sawService->calculateSAWScores($startDate, $endDate);
         $sawValidation = $sawService->canPerformSAW($startDate, $endDate);
@@ -340,6 +430,14 @@ class PenilaianKaryawanController extends Controller
         $endDate = $request->get('end_date');
         $employeeId = $request->get('employee_id');
 
+        // Check if dates are provided and valid
+        $hasValidDates = $startDate && $endDate && $this->isValidDate($startDate) && $this->isValidDate($endDate);
+
+        if (!$hasValidDates) {
+            $startDate = null;
+            $endDate = null;
+        }
+
         $sawService = app(SAWCalculationService::class);
 
         if ($employeeId) {
@@ -358,6 +456,14 @@ class PenilaianKaryawanController extends Controller
     {
         $startDate = $request->get('start_date');
         $endDate = $request->get('end_date');
+
+        // Check if dates are provided and valid
+        $hasValidDates = $startDate && $endDate && $this->isValidDate($startDate) && $this->isValidDate($endDate);
+
+        if (!$hasValidDates) {
+            $startDate = null;
+            $endDate = null;
+        }
 
         $sawService = app(SAWCalculationService::class);
         $stats = $sawService->getCriteriaStatistics($startDate, $endDate);
@@ -379,9 +485,21 @@ class PenilaianKaryawanController extends Controller
         $startDate = $request->get('start_date');
         $endDate = $request->get('end_date');
 
+        // Check if dates are provided and valid
+        $hasValidDates = false;
+        if ($startDate && $endDate && $this->isValidDate($startDate) && $this->isValidDate($endDate)) {
+            $hasValidDates = true;
+        } else {
+            $startDate = null;
+            $endDate = null;
+        }
+
         $employees = DataKaryawan::where('is_active', true)
-            ->with(['penilaian' => function($query) use ($startDate, $endDate) {
-                $query->whereBetween('waktu_penilaian', [$startDate, $endDate]);
+            ->with(['penilaian' => function($query) use ($startDate, $endDate, $hasValidDates) {
+                if ($hasValidDates) {
+                    $query->whereBetween('waktu_penilaian', [$startDate, $endDate]);
+                }
+                // If no valid dates, load all penilaian data
             }])
             ->get();
 
@@ -415,6 +533,15 @@ class PenilaianKaryawanController extends Controller
         // Handle date range parameters
         $startDate = $request->get('start_date');
         $endDate = $request->get('end_date');
+
+        // Check if dates are provided and valid
+        $hasValidDates = false;
+        if ($startDate && $endDate && $this->isValidDate($startDate) && $this->isValidDate($endDate)) {
+            $hasValidDates = true;
+        } else {
+            $startDate = null;
+            $endDate = null;
+        }
 
         $sawService = app(SAWCalculationService::class);
         $sawResults = $sawService->calculateSAWScores($startDate, $endDate);
@@ -476,8 +603,22 @@ class PenilaianKaryawanController extends Controller
         $startDate = $request->get('start_date');
         $endDate = $request->get('end_date');
 
-        $assessments = PenilaianKaryawan::where('id_karyawan', $employeeId)
-            ->whereBetween('waktu_penilaian', [$startDate, $endDate])
+        // Check if dates are provided and valid
+        $hasValidDates = false;
+        if ($startDate && $endDate && $this->isValidDate($startDate) && $this->isValidDate($endDate)) {
+            $hasValidDates = true;
+        } else {
+            $startDate = null;
+            $endDate = null;
+        }
+
+        $assessmentsQuery = PenilaianKaryawan::where('id_karyawan', $employeeId);
+
+        if ($hasValidDates) {
+            $assessmentsQuery->whereBetween('waktu_penilaian', [$startDate, $endDate]);
+        }
+
+        $assessments = $assessmentsQuery
             ->with(['kriteriaBobot', 'penilai'])
             ->get();
 
@@ -496,5 +637,18 @@ class PenilaianKaryawanController extends Controller
             'sawValidation',
             'criteriaStats'
         ));
+    }
+
+    /**
+     * Helper method to validate date format
+     */
+    private function isValidDate($date)
+    {
+        if (!$date) {
+            return false;
+        }
+
+        $d = \DateTime::createFromFormat('Y-m-d', $date);
+        return $d && $d->format('Y-m-d') === $date;
     }
 }

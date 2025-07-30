@@ -26,8 +26,11 @@ class SAWCalculationService
         // Step 2: Get all employees with assessments for the date range
         $employees = DataKaryawan::where('is_active', true)
             ->with(['penilaian' => function($query) use ($startDate, $endDate) {
-                $query->whereBetween('waktu_penilaian', [$startDate, $endDate])
-                      ->with('kriteriaBobot');
+                if ($startDate && $endDate) {
+                    $query->whereBetween('waktu_penilaian', [$startDate, $endDate]);
+                }
+                // If no dates provided, load all penilaian data
+                $query->with('kriteriaBobot');
             }])
             ->get();
 
@@ -159,12 +162,17 @@ class SAWCalculationService
                 $sawScore += $weightedScore;
             }
             
+            // Get the latest assessment time for this employee
+            $latestAssessment = $employeeData['employee']->penilaian->sortByDesc('waktu_penilaian')->first();
+            $waktuPenilaian = $latestAssessment ? $latestAssessment->waktu_penilaian->format('d/m/Y') : '-';
+
             $finalScores[$employeeId] = [
                 'employee' => $employeeData['employee'],
                 'weighted_scores' => $weightedScores,
                 'saw_score' => $sawScore,
                 'saw_score_percentage' => $sawScore * 100, // Convert to percentage for display
-                'max_values' => $employeeData['max_values']
+                'max_values' => $employeeData['max_values'],
+                'waktu_penilaian_karyawan' => $waktuPenilaian
             ];
         }
 
@@ -195,7 +203,7 @@ class SAWCalculationService
      */
     public function getEmployeeSAWDetails($employeeId, $startDate, $endDate)
     {
-        $allScores = $this->calculateSAWScores($startDate, $endDate);
+            $allScores = $this->calculateSAWScores($startDate, $endDate);
 
         return $allScores->firstWhere('employee.id_karyawan', $employeeId);
     }
@@ -211,9 +219,13 @@ class SAWCalculationService
         $statistics = [];
 
         foreach ($criteria as $criterion) {
-            $assessments = PenilaianKaryawan::whereBetween('waktu_penilaian', [$startDate, $endDate])
-                ->where('id_kriteria_bobot', $criterion->id_kriteria)
-                ->pluck('nilai');
+            $assessmentsQuery = PenilaianKaryawan::where('id_kriteria_bobot', $criterion->id_kriteria);
+
+            if ($startDate && $endDate) {
+                $assessmentsQuery->whereBetween('waktu_penilaian', [$startDate, $endDate]);
+            }
+
+            $assessments = $assessmentsQuery->pluck('nilai');
 
             if ($assessments->isNotEmpty()) {
                 $statistics[$criterion->id_kriteria] = [
@@ -237,7 +249,12 @@ class SAWCalculationService
     public function canPerformSAW($startDate, $endDate)
     {
         $approvedCriteria = KriteriaBobot::where('status', 'Disetujui')->count();
-        $assessmentsCount = PenilaianKaryawan::whereBetween('waktu_penilaian', [$startDate, $endDate])->count();
+
+        if ($startDate && $endDate) {
+            $assessmentsCount = PenilaianKaryawan::whereBetween('waktu_penilaian', [$startDate, $endDate])->count();
+        } else {
+            $assessmentsCount = PenilaianKaryawan::count();
+        }
 
         return [
             'can_calculate' => $approvedCriteria > 0 && $assessmentsCount > 0,

@@ -71,7 +71,7 @@ class EmployeeScoresSheet implements FromCollection, WithHeadings, WithMapping, 
             'Jenis Kelamin',
             'Tanggal Masuk',
             'Skor SAW (%)',
-            'Periode'
+            'Waktu Penilaian Karyawan'
         ];
 
         // Add individual criteria headers
@@ -95,7 +95,7 @@ class EmployeeScoresSheet implements FromCollection, WithHeadings, WithMapping, 
             $employee->jenis_kelamin,
             Carbon::parse($employee->tanggal_masuk)->format('d/m/Y'),
             number_format($result['saw_score_percentage'], 2),
-            Carbon::parse($this->period)->format('F Y')
+            $result['waktu_penilaian_karyawan'] ?? '-'
         ];
 
         // Add individual criteria scores
@@ -186,9 +186,8 @@ class EmployeeScoresSheet implements FromCollection, WithHeadings, WithMapping, 
                 }
 
                 // Add title and metadata
-                $sheet->insertNewRowBefore(1, 4);
+                $sheet->insertNewRowBefore(1, 3);
                 $sheet->setCellValue('A1', 'HASIL PENILAIAN KARYAWAN');
-                $sheet->setCellValue('A2', 'Periode: ' . Carbon::parse($this->period)->format('F Y'));
                 $sheet->setCellValue('A3', 'Tanggal Export: ' . now()->format('d/m/Y H:i:s'));
                 $sheet->setCellValue('A4', 'Metode: SAW (Simple Additive Weighting)');
 
@@ -202,6 +201,8 @@ class EmployeeScoresSheet implements FromCollection, WithHeadings, WithMapping, 
             }
         ];
     }
+
+
 }
 
 class CriteriaStatsSheet implements FromCollection, WithHeadings, WithMapping, WithStyles, WithTitle, ShouldAutoSize, WithEvents
@@ -277,6 +278,8 @@ class CriteriaStatsSheet implements FromCollection, WithHeadings, WithMapping, W
             },
         ];
     }
+
+
 }
 
 class SAWCalculationSheet implements FromCollection, WithHeadings, WithMapping, WithStyles, WithTitle, ShouldAutoSize, WithEvents
@@ -372,4 +375,6 @@ class SAWCalculationSheet implements FromCollection, WithHeadings, WithMapping, 
             },
         ];
     }
+
+
 }
