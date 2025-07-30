@@ -574,6 +574,62 @@ class PenilaianKaryawanController extends Controller
     }
 
     /**
+     * Show employee's own assessment results
+     * UC10-TC01: Karyawan melihat hasil sendiri
+     */
+    public function myResults(Request $request)
+    {
+        // Get the employee data for the logged-in user
+        $employee = DataKaryawan::where('user_id', auth()->id())
+            ->where('is_active', true)
+            ->first();
+
+        if (!$employee) {
+            abort(404, 'Data karyawan tidak ditemukan atau tidak aktif.');
+        }
+
+        // Date range handling
+        $startDate = $request->get('start_date');
+        $endDate = $request->get('end_date');
+        $hasValidDates = $startDate && $endDate;
+
+        // Get employee's assessments
+        $assessmentsQuery = PenilaianKaryawan::where('id_karyawan', $employee->id_karyawan);
+
+        if ($hasValidDates) {
+            $assessmentsQuery->whereBetween('waktu_penilaian', [$startDate, $endDate]);
+        }
+
+        $assessments = $assessmentsQuery
+            ->with(['kriteriaBobot', 'penilai'])
+            ->get();
+
+        // Get approved criteria
+        $approvedCriteria = KriteriaBobot::where('status', 'Disetujui')->get();
+
+        // SAW calculations
+        $sawService = app(SAWCalculationService::class);
+        $sawDetails = $sawService->getEmployeeSAWDetails($employee->id_karyawan, $startDate, $endDate);
+        $sawValidation = $sawService->canPerformSAW($startDate, $endDate);
+        $criteriaStats = $sawService->getCriteriaStatistics($startDate, $endDate);
+
+        // Get all SAW results to determine ranking
+        $allSawResults = $sawService->calculateSAWScores($startDate, $endDate);
+
+        return view('employee.my_results', compact(
+            'employee',
+            'assessments',
+            'approvedCriteria',
+            'startDate',
+            'endDate',
+            'sawDetails',
+            'sawValidation',
+            'criteriaStats',
+            'allSawResults'
+        ));
+    }
+
+    /**
      * Results summary for Pemimpin Perusahaan
      */
     public function getResultsSummary(Request $request)

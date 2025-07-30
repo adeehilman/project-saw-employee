@@ -29,7 +29,7 @@ class PenilaianApprovalController extends Controller
      */
     public function show($id)
     {
-        $criteria = KriteriaBobot::with(['creator', 'approver', 'auditTrail.user'])
+        $criteria = KriteriaBobot::with(['creator', 'approver'])
             ->findOrFail($id);
         
         return view('approval.show', compact('criteria'));

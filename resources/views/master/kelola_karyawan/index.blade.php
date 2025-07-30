@@ -18,7 +18,7 @@
         <x-panel.show title="Daftar" subtitle="Karyawan">
             <x-slot name="paneltoolbar">
                 <x-panel.tool-bar>
-                    <a href="{{ route('kelola_karyawan.create') }}" class="btn btn-primary btn-sm">Tambah Data</a>
+                    <a href="{{ route('kelola-karyawan.create') }}" class="btn btn-primary btn-sm">Tambah Data</a>
                 </x-panel.tool-bar>
             </x-slot>
             <table id="dt-basic-example" class="table table-bordered table-hover table-striped w-100">
@@ -41,11 +41,11 @@
                             <td>{{ $karyawan->jabatan }}</td>
                             <td>{{ $karyawan->tanggal_masuk }}</td>
                             <td>
-                                <a href="{{ route('kelola_karyawan.show', $karyawan->id_karyawan) }}"
+                                <a href="{{ route('kelola-karyawan.show', $karyawan->id_karyawan) }}"
                                     class="btn btn-info">Detail</a>
-                                <a href="{{ route('kelola_karyawan.edit', $karyawan->id_karyawan) }}"
+                                <a href="{{ route('kelola-karyawan.edit', $karyawan->id_karyawan) }}"
                                     class="btn btn-warning">Edit</a>
-                                <form action="{{ route('kelola_karyawan.destroy', $karyawan->id_karyawan) }}" method="POST"
+                                <form action="{{ route('kelola-karyawan.destroy', $karyawan->id_karyawan) }}" method="POST"
                                     style="display:inline-block;">
                                     @csrf
                                     @method('DELETE')

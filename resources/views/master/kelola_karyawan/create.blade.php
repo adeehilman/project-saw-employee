@@ -17,7 +17,7 @@
             ])
             @endcomponent
         </div>
-        <form action="{{ route('kelola_karyawan.store') }}" method="POST">
+        <form action="{{ route('kelola-karyawan.store') }}" method="POST">
             @csrf
             <x-panel.show title="Tambah Data Karyawan">
                 <x-slot name="paneltoolbar">
@@ -27,7 +27,7 @@
                             <i class="fal fa-ellipsis-v"></i>
                         </button>
                         <div class="dropdown-menu dropdown-menu-animated dropdown-menu-right">
-                            <a class="dropdown-item" href="{{ route('kelola_karyawan.index') }}">Kembali</a>
+                            <a class="dropdown-item" href="{{ route('kelola-karyawan.index') }}">Kembali</a>
                             {{--
                         <a class="dropdown-item" href="#">Another action</a>
                         <div class="dropdown-divider m-0"></div>

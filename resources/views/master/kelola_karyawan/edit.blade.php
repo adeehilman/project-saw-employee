@@ -20,7 +20,7 @@
             @endcomponent
         </div>
 
-        <form action="{{ route('kelola_karyawan.update', $dataKaryawan) }}" method="POST">
+        <form action="{{ route('kelola-karyawan.update', $dataKaryawan) }}" method="POST">
             @csrf
             @method('PUT')
             <x-panel.show title="Default" subtitle="Example">
@@ -31,7 +31,7 @@
                             <i class="fal fa-ellipsis-v"></i>
                         </button>
                         <div class="dropdown-menu dropdown-menu-animated dropdown-menu-right">
-                            <a class="dropdown-item" href="{{ route('kelola_karyawan.index') }}">Kembali</a>
+                            <a class="dropdown-item" href="{{ route('kelola-karyawan.index') }}">Kembali</a>
                         </div>
                     </x-panel.tool-bar>
                 </x-slot>

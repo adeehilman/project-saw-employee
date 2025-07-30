@@ -59,7 +59,7 @@ class KelolaKaryawanController extends Controller
                 'user_id' => $user->id,
             ]);
 
-            return redirect()->route('kelola_karyawan.index')->with('success', 'Data Karyawan created successfully.');
+            return redirect()->route('kelola-karyawan.index')->with('success', 'Data Karyawan created successfully.');
         } catch (\Throwable $th) {
             return redirect()->back()->with('error', $th->getMessage());
         }
@@ -97,7 +97,7 @@ class KelolaKaryawanController extends Controller
             'is_active' => $request->aktif,
         ]);
 
-        return redirect()->route('kelola_karyawan.index')->with('success', 'Data Karyawan updated successfully.');
+        return redirect()->route('kelola-karyawan.index')->with('success', 'Data Karyawan updated successfully.');
     }
 
     public function destroy($id)
@@ -105,6 +105,6 @@ class KelolaKaryawanController extends Controller
         $dataKaryawan = DataKaryawan::findOrFail($id);
         $dataKaryawan->delete();
 
-        return redirect()->route('kelola_karyawan.index')->with('success', 'Data Guru deleted successfully.');
+        return redirect()->route('kelola-karyawan.index')->with('success', 'Data Guru deleted successfully.');
     }
 }

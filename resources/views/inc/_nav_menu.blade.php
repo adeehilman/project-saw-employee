@@ -6,6 +6,16 @@
         </a>
     </li>
 
+    @if (auth()->user()->role == 'Karyawan')
+        
+        <li class="{{ Request::is('hasil-penilaian-saya*') ? 'active' : '' }}">
+            <a href="{{ route('employee.my_results') }}" title="Lihat Hasil Penilaian Saya"
+                data-filter-tags="hasil penilaian saya karyawan">
+                <span class="nav-link-text" data-i18n="nav.hasil_penilaian_saya">Lihat Hasil Penilaian</span>
+            </a>
+        </li>
+    @endif
+
     @if (auth()->user()->role == 'Admin' || auth()->user()->role == 'Pemimpin Perusahaan')
         @include('inc.mainmenu._menu_master')
     @endif

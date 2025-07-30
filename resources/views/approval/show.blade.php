@@ -118,59 +118,6 @@
                 </x-panel.show>
             </div>
 
-            <!-- Audit Trail -->
-            <div class="col-lg-4">
-                <x-panel.show title="Riwayat Aktivitas" subtitle="Timeline perubahan status">
-                    @if($criteria->auditTrail->count() > 0)
-                        <div class="timeline timeline-sm">
-                            @foreach($criteria->auditTrail as $audit)
-                                <div class="timeline-item">
-                                    <div class="timeline-marker">
-                                        @if($audit->action == 'Disetujui')
-                                            <i class="fal fa-check text-success"></i>
-                                        @elseif($audit->action == 'Ditolak')
-                                            <i class="fal fa-times text-danger"></i>
-                                        @elseif($audit->action == 'submitted')
-                                            <i class="fal fa-paper-plane text-info"></i>
-                                        @elseif($audit->action == 'resubmitted')
-                                            <i class="fal fa-redo text-warning"></i>
-                                        @else
-                                            <i class="fal fa-circle text-muted"></i>
-                                        @endif
-                                    </div>
-                                    <div class="timeline-content">
-                                        <h6 class="timeline-title">
-                                            @if($audit->action == 'Disetujui')
-                                                <span class="text-success">Disetujui</span>
-                                            @elseif($audit->action == 'Ditolak')
-                                                <span class="text-danger">Ditolak</span>
-                                            @elseif($audit->action == 'submitted')
-                                                <span class="text-info">Diajukan</span>
-                                            @elseif($audit->action == 'resubmitted')
-                                                <span class="text-warning">Diajukan Ulang</span>
-                                            @else
-                                                {{ ucfirst($audit->action) }}
-                                            @endif
-                                        </h6>
-                                        <p class="timeline-text">
-                                            Oleh: <strong>{{ $audit->user->name }}</strong>
-                                            @if($audit->reason)
-                                                <br><small class="text-muted">{{ $audit->reason }}</small>
-                                            @endif
-                                        </p>
-                                        <small class="timeline-time">{{ $audit->created_at->format('d/m/Y H:i') }}</small>
-                                    </div>
-                                </div>
-                            @endforeach
-                        </div>
-                    @else
-                        <div class="text-center py-4">
-                            <i class="fal fa-history text-muted" style="font-size: 3rem;"></i>
-                            <p class="mt-3 text-muted">Belum ada riwayat aktivitas</p>
-                        </div>
-                    @endif
-                </x-panel.show>
-            </div>
         </div>
     </main>
 

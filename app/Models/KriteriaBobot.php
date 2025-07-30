@@ -123,7 +123,7 @@ class KriteriaBobot extends Model
     public static function getPendingApprovals()
     {
         return static::where('status', 'Menunggu')
-            ->with(['creator', 'auditTrail.user'])
+            ->with(['creator'])
             ->orderBy('submitted_at', 'asc')
             ->get();
     }

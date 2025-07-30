@@ -33,11 +33,6 @@
                     <i class="fal fa-times-circle text-danger"></i> Ditolak ({{ $rejectedCriteria->count() }})
                 </a>
             </li>
-            <li class="nav-item">
-                <a class="nav-link" id="audit-tab" data-toggle="tab" href="#audit" role="tab">
-                    <i class="fal fa-list"></i> Log Aktivitas
-                </a>
-            </li>
         </ul>
 
         <div class="tab-content" id="historyTabsContent">
@@ -163,12 +158,6 @@
             $('#rejected-table').dataTable({
                 responsive: true,
                 order: [[5, 'desc']] // Sort by rejection date
-            });
-
-            $('#audit-table').dataTable({
-                responsive: true,
-                order: [[0, 'desc']], // Sort by date
-                pageLength: 25
             });
 
             // Handle tab switching

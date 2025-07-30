@@ -27,7 +27,7 @@
                         <i class="fal fa-ellipsis-v"></i>
                     </button>
                     <div class="dropdown-menu dropdown-menu-animated dropdown-menu-right">
-                        <a class="dropdown-item" href="{{ route('kelola_karyawan.index') }}">Kembali</a>
+                        <a class="dropdown-item" href="{{ route('kelola-karyawan.index') }}">Kembali</a>
                     </div>
                 </x-panel.tool-bar>
             </x-slot>
@@ -42,13 +42,13 @@
                     <p><strong>Jabatan:</strong> {{ $dataKaryawan->jabatan }}</p>
                     <p><strong>Tanggal Masuk:</strong> {{ $dataKaryawan->tanggal_masuk }}</p>
                     <p><strong>Status Aktif:</strong> {{ $dataKaryawan->is_active }}</p>
-                    <a href="{{ route('kelola_karyawan.edit', $dataKaryawan) }}" class="btn btn-primary">Edit</a>
-                    <form action="{{ route('kelola_karyawan.destroy', $dataKaryawan) }}" method="POST" style="display:inline;">
+                    <a href="{{ route('kelola-karyawan.edit', $dataKaryawan) }}" class="btn btn-primary">Edit</a>
+                    <form action="{{ route('kelola-karyawan.destroy', $dataKaryawan) }}" method="POST" style="display:inline;">
                         @csrf
                         @method('DELETE')
                         <button type="submit" class="btn btn-danger">Delete</button>
                     </form>
-                    <a href="{{ route('kelola_karyawan.index') }}" class="btn btn-secondary">Back</a>
+                    <a href="{{ route('kelola-karyawan.index') }}" class="btn btn-secondary">Back</a>
                 </div>
             </div>
         </x-panel.show>

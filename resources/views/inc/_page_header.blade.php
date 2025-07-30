@@ -56,10 +56,6 @@
             </a>
         </div>
 
-        @foreach (App\Helpers\Fitures::getFiturAktif() as $fiturView)
-            @include($fiturView)
-        @endforeach
-
         <div>
             <a href="#" data-toggle="dropdown" title="drlantern@gotbootstrap.com"
                 class="header-icon d-flex align-items-center justify-content-center ml-2">

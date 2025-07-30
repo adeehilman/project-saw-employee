@@ -22,11 +22,11 @@
                         <div class="p-3 bg-primary-300 rounded overflow-hidden position-relative text-white mb-g">
                             <div class="">
                                 <h3 class="display-4 d-block l-h-n m-0 fw-500">
-                                    21.5k
-                                    <small class="m-0 l-h-n">users signed up</small>
+                                    {{ \App\Models\DataKaryawan::where('is_active', true)->count() }}
+                                    <small class="m-0 l-h-n">Karyawan Aktif</small>
                                 </h3>
                             </div>
-                            <i class="fal fa-user position-absolute pos-right pos-bottom opacity-15 mb-n1 mr-n1"
+                            <i class="fal fa-users position-absolute pos-right pos-bottom opacity-15 mb-n1 mr-n1"
                                 style="font-size:6rem"></i>
                         </div>
                     </div>
@@ -34,11 +34,11 @@
                         <div class="p-3 bg-warning-400 rounded overflow-hidden position-relative text-white mb-g">
                             <div class="">
                                 <h3 class="display-4 d-block l-h-n m-0 fw-500">
-                                    $10,203
-                                    <small class="m-0 l-h-n">Visual Index Figure</small>
+                                    {{ \App\Models\KriteriaBobot::where('status', 'Disetujui')->count() }}
+                                    <small class="m-0 l-h-n">Kriteria Disetujui</small>
                                 </h3>
                             </div>
-                            <i class="fal fa-gem position-absolute pos-right pos-bottom opacity-15  mb-n1 mr-n4"
+                            <i class="fal fa-balance-scale position-absolute pos-right pos-bottom opacity-15  mb-n1 mr-n4"
                                 style="font-size: 6rem;"></i>
                         </div>
                     </div>
@@ -46,11 +46,11 @@
                         <div class="p-3 bg-success-200 rounded overflow-hidden position-relative text-white mb-g">
                             <div class="">
                                 <h3 class="display-4 d-block l-h-n m-0 fw-500">
-                                    - 103.72
-                                    <small class="m-0 l-h-n">Offset Balance Ratio</small>
+                                    {{ \App\Models\PenilaianKaryawan::count() }}
+                                    <small class="m-0 l-h-n">Total Penilaian</small>
                                 </h3>
                             </div>
-                            <i class="fal fa-lightbulb position-absolute pos-right pos-bottom opacity-15 mb-n5 mr-n6"
+                            <i class="fal fa-chart-line position-absolute pos-right pos-bottom opacity-15 mb-n5 mr-n6"
                                 style="font-size: 8rem;"></i>
                         </div>
                     </div>
@@ -58,11 +58,11 @@
                         <div class="p-3 bg-info-200 rounded overflow-hidden position-relative text-white mb-g">
                             <div class="">
                                 <h3 class="display-4 d-block l-h-n m-0 fw-500">
-                                    +40%
-                                    <small class="m-0 l-h-n">Product level increase</small>
+                                    {{ \App\Models\KriteriaBobot::where('status', 'Menunggu')->count() }}
+                                    <small class="m-0 l-h-n">Menunggu Persetujuan</small>
                                 </h3>
                             </div>
-                            <i class="fal fa-globe position-absolute pos-right pos-bottom opacity-15 mb-n1 mr-n4"
+                            <i class="fal fa-clock position-absolute pos-right pos-bottom opacity-15 mb-n1 mr-n4"
                                 style="font-size: 6rem;"></i>
                         </div>
                     </div>
