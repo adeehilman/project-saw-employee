@@ -57,6 +57,7 @@ class KelolaKaryawanController extends Controller
                 'tanggal_masuk' => $request->tanggal_masuk,
                 'jabatan' => $request->jabatan,
                 'user_id' => $user->id,
+                'is_active' => 'true'
             ]);
 
             return redirect()->route('kelola-karyawan.index')->with('success', 'Data Karyawan created successfully.');
