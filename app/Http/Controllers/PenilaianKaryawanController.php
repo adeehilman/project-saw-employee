@@ -371,8 +371,6 @@ class PenilaianKaryawanController extends Controller
         $request->validate([
             'start_date' => 'required|date',
             'end_date' => 'required|date',
-            'employee_ids' => 'array',
-            'employee_ids.*' => 'exists:data_karyawan,id_karyawan'
         ]);
 
         $query = PenilaianKaryawan::whereBetween('waktu_penilaian', [$request->start_date, $request->end_date]);

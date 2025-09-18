@@ -60,7 +60,7 @@ Route::middleware(['auth'])->group(function () {
             Route::resource('kelola-karyawan', KelolaKaryawanController::class);
             Route::resource('kriteria_bobot', PenilaianBobotKaryawanController::class);
         });
-            
+
         Route::prefix('penilaian')->group(function () {
             Route::resource('kriteria_bobot', PenilaianBobotKaryawanController::class);
         });
@@ -78,8 +78,8 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/{employee}/edit', [PenilaianKaryawanController::class, 'edit'])->name('penilaian_karyawan.edit');
         Route::get('/{employee}/show', [PenilaianKaryawanController::class, 'show'])->name('penilaian_karyawan.show');
         Route::post('/store', [PenilaianKaryawanController::class, 'store'])->name('penilaian_karyawan.store');
-        Route::delete('/{assessment}', [PenilaianKaryawanController::class, 'destroy'])->name('penilaian_karyawan.destroy');
-        Route::delete('/bulk-delete', [PenilaianKaryawanController::class, 'bulkDelete'])->name('penilaian_karyawan.bulk-delete');
+        Route::post('/{assessment}', [PenilaianKaryawanController::class, 'destroy'])->name('penilaian_karyawan.destroy');
+        Route::post('/bulk-delete', [PenilaianKaryawanController::class, 'bulkDelete'])->name('penilaian_karyawan.bulk-delete');
     });
 
         // Approval routes - accessible by leadership roles
