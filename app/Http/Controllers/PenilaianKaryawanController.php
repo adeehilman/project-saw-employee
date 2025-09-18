@@ -368,15 +368,8 @@ class PenilaianKaryawanController extends Controller
      */
     public function bulkDelete(Request $request)
     {
-        $request->validate([
-            'start_date' => 'required|date',
-            'end_date' => 'required|date',
-        ]);
-
-        $query = PenilaianKaryawan::whereBetween('waktu_penilaian', [$request->start_date, $request->end_date]);
-
         if ($request->has('employee_ids') && !empty($request->employee_ids)) {
-            $query->whereIn('id_karyawan', $request->employee_ids);
+            $query = PenilaianKaryawan::whereIn('id_karyawan', $request->employee_ids);
         }
 
         $deletedCount = $query->delete();
