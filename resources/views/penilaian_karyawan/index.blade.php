@@ -501,17 +501,13 @@
             message += `. Tindakan ini tidak dapat dibatalkan.`;
 
             $('#deleteMessage').text(message);
-            $('#deleteForm').attr('action', `{{ route('penilaian_karyawan.bulk-delete', ${employeeId}) }}`);
+            
+            // Fix the route generation - use proper URL generation
+            let deleteUrl = '{{ route('penilaian_karyawan.bulk-delete') }}';
+            $('#deleteForm').attr('action', deleteUrl);
 
             // Add hidden inputs
-            $('#deleteForm').find('input[name="start_date"]').remove();
-            $('#deleteForm').find('input[name="end_date"]').remove();
             $('#deleteForm').find('input[name="employee_ids[]"]').remove();
-
-            if (startDate && endDate) {
-                $('#deleteForm').append(`<input type="hidden" name="start_date" value="${startDate}">`);
-                $('#deleteForm').append(`<input type="hidden" name="end_date" value="${endDate}">`);
-            }
             $('#deleteForm').append(`<input type="hidden" name="employee_ids[]" value="${employeeId}">`);
 
             $('#deleteModal').modal('show');
