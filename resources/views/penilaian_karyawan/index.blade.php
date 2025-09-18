@@ -154,7 +154,7 @@
                     <tbody>
                         @foreach ($employees as $employee)
                             @php
-                                $assessmentCount = $employee->penilaian->count();
+                                $assessmentCount = $employee->penilaian->where('nilai', '>', 0)->count();
                                 $totalCriteria = $approvedCriteria->count();
                                 $isComplete = $assessmentCount >= $totalCriteria;
                                 $lastAssessment = $employee->penilaian->sortByDesc('updated_at')->first();
@@ -211,10 +211,18 @@
                                        class="btn btn-info btn-sm">
                                         <i class="fal fa-eye"></i> Detail
                                     </a>
-                                    <a href="{{ route('penilaian_karyawan.create', ['employee' => $employee->id_karyawan, 'start_date' => $startDate, 'end_date' => $endDate]) }}"
+                                    @if($assessmentCount > 0)
+                                    <a href="{{ route('penilaian_karyawan.edit', ['employee' => $employee->id_karyawan, 'start_date' => $startDate, 'end_date' => $endDate]) }}"
                                        class="btn btn-primary btn-sm">
-                                        <i class="fal fa-star"></i> {{ $assessmentCount > 0 ? 'Edit' : 'Nilai' }}
+                                        <i class="fal fa-star"></i> Edit
                                     </a>
+                                    @else
+                                        <a href="{{ route('penilaian_karyawan.create', ['employee' => $employee->id_karyawan, 'start_date' => $startDate, 'end_date' => $endDate]) }}"
+                                       class="btn btn-primary btn-sm">
+                                            <i class="fal fa-star"></i> Nilai
+                                        </a>
+                                    @endif
+
                                     @if($assessmentCount > 0)
                                         <button type="button" class="btn btn-danger btn-sm"
                                                 onclick="confirmDeleteAssessments('{{ $employee->id_karyawan }}', '{{ $employee->nama_karyawan }}')">

@@ -44,6 +44,7 @@ class PenilaianKaryawanController extends Controller
         // Load employees with conditional date filtering
         $employees = DataKaryawan::where('is_active', true)
             ->with(['penilaian' => function($query) use ($startDate, $endDate, $hasValidDates) {
+                $query->where('nilai', '>', 0);  // Only load assessments with nilai > 0
                 if ($hasValidDates) {
                     $query->whereBetween('waktu_penilaian', [$startDate, $endDate]);
                 }
@@ -99,7 +100,8 @@ class PenilaianKaryawanController extends Controller
         }
 
         // Get existing assessments for this employee and date range
-        $existingAssessmentsQuery = PenilaianKaryawan::where('id_karyawan', $employeeId);
+        $existingAssessmentsQuery = PenilaianKaryawan::where('id_karyawan', $employeeId)
+            ->where('nilai', '>', 0);  // Only get assessments with nilai > 0
 
         if ($hasValidDates) {
             $existingAssessmentsQuery->whereBetween('waktu_penilaian', [$startDate, $endDate]);
@@ -196,7 +198,8 @@ class PenilaianKaryawanController extends Controller
             $endDate = null;
         }
 
-        $assessmentsQuery = PenilaianKaryawan::where('id_karyawan', $employeeId);
+        $assessmentsQuery = PenilaianKaryawan::where('id_karyawan', $employeeId)
+            ->where('nilai', '>', 0);  // Only show assessments with nilai > 0
 
         if ($hasValidDates) {
             $assessmentsQuery->whereBetween('waktu_penilaian', [$startDate, $endDate]);
@@ -228,7 +231,102 @@ class PenilaianKaryawanController extends Controller
      */
     public function edit($employeeId, Request $request)
     {
-        return $this->create($employeeId, $request);
+        $employee = DataKaryawan::findOrFail($employeeId);
+
+        // Handle date range parameters
+        $startDate = $request->get('start_date');
+        $endDate = $request->get('end_date');
+
+        // Check if dates are provided and valid
+        $hasValidDates = false;
+        if ($startDate && $endDate && $this->isValidDate($startDate) && $this->isValidDate($endDate)) {
+            $hasValidDates = true;
+        } else {
+            $startDate = null;
+            $endDate = null;
+        }
+
+        // Get approved criteria
+        $approvedCriteria = KriteriaBobot::where('status', 'Disetujui')
+            ->orderBy('kriteria')
+            ->get();
+
+        if ($approvedCriteria->isEmpty()) {
+            return redirect()->route('penilaian_karyawan.index')
+                ->with('error', 'Tidak ada kriteria yang disetujui. Silakan tunggu persetujuan kriteria terlebih dahulu.');
+        }
+
+        // Get existing assessments for this employee and date range
+        $existingAssessmentsQuery = PenilaianKaryawan::where('id_karyawan', $employeeId)
+            ->where('nilai', '>', 0);  // Only get assessments with nilai > 0
+
+        if ($hasValidDates) {
+            $existingAssessmentsQuery->whereBetween('waktu_penilaian', [$startDate, $endDate]);
+        }
+
+        $existingAssessments = $existingAssessmentsQuery
+            ->with('kriteriaBobot')
+            ->get()
+            ->keyBy('id_kriteria_bobot');
+
+        // Return the edit view instead of the create view
+        return view('penilaian_karyawan.edit', compact('employee', 'approvedCriteria', 'startDate', 'endDate', 'existingAssessments'));
+    }
+
+    /**
+     * Update employee scores
+     */
+    public function update(Request $request, $employeeId)
+    {
+        $request->validate([
+            'id_karyawan' => 'required|exists:data_karyawan,id_karyawan',
+            'scores' => 'required|array',
+            'scores.*' => 'required|numeric|min:0|max:100',
+            'catatan' => 'array',
+            'catatan.*' => 'nullable|string|max:500'
+        ]);
+
+        try {
+            $employeeId = $request->id_karyawan;
+            $scores = $request->scores;
+            $catatan = $request->catatan ?? [];
+
+            foreach ($scores as $kriteriaId => $nilai) {
+                // Check if assessment already exists
+                $existingAssessment = PenilaianKaryawan::where('id_karyawan', $employeeId)
+                    ->where('id_kriteria_bobot', $kriteriaId)
+                    ->first();
+
+                if ($existingAssessment) {
+                    // Update existing assessment
+                    $existingAssessment->update([
+                        'nilai' => $nilai,
+                        'catatan' => $catatan[$kriteriaId] ?? null,
+                        'dinilai_oleh' => Auth::id()
+                    ]);
+                } else {
+                    // Create new assessment
+                    PenilaianKaryawan::create([
+                        'id_penilaian' => PenilaianKaryawan::generateId(),
+                        'id_karyawan' => $employeeId,
+                        'id_kriteria_bobot' => $kriteriaId,
+                        'nilai' => $nilai,
+                        'catatan' => $catatan[$kriteriaId] ?? null,
+                        'dinilai_oleh' => Auth::id()
+                    ]);
+                }
+            }
+
+            // Calculate date range for redirect (use the assessment date as both start and end for the month)
+
+            return redirect()->route('penilaian_karyawan.index')
+                ->with('success', 'Penilaian karyawan berhasil diperbarui.');
+
+        } catch (\Exception $e) {
+            return redirect()->back()
+                ->withInput()
+                ->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
+        }
     }
 
     /**
@@ -261,13 +359,18 @@ class PenilaianKaryawanController extends Controller
 
         if ($hasValidDates) {
             $assessedEmployees = PenilaianKaryawan::whereBetween('waktu_penilaian', [$startDate, $endDate])
+                ->where('nilai', '>', 0)  // Only count assessments with nilai > 0
                 ->distinct('id_karyawan')
                 ->count('id_karyawan');
-            $totalAssessments = PenilaianKaryawan::whereBetween('waktu_penilaian', [$startDate, $endDate])->count();
+            $totalAssessments = PenilaianKaryawan::whereBetween('waktu_penilaian', [$startDate, $endDate])
+                ->where('nilai', '>', 0)  // Only count assessments with nilai > 0
+                ->count();
         } else {
-            $assessedEmployees = PenilaianKaryawan::distinct('id_karyawan')
+            $assessedEmployees = PenilaianKaryawan::where('nilai', '>', 0)  // Only count assessments with nilai > 0
+                ->distinct('id_karyawan')
                 ->count('id_karyawan');
-            $totalAssessments = PenilaianKaryawan::count();
+            $totalAssessments = PenilaianKaryawan::where('nilai', '>', 0)  // Only count assessments with nilai > 0
+                ->count();
         }
 
         $approvedCriteria = KriteriaBobot::where('status', 'Disetujui')->count();
@@ -277,7 +380,8 @@ class PenilaianKaryawanController extends Controller
             $employees = DataKaryawan::where('is_active', true)->get();
             foreach ($employees as $employee) {
                 // Check if employee has assessments for all approved criteria
-                $employeeAssessmentsQuery = PenilaianKaryawan::where('id_karyawan', $employee->id_karyawan);
+                $employeeAssessmentsQuery = PenilaianKaryawan::where('id_karyawan', $employee->id_karyawan)
+                    ->where('nilai', '>', 0);  // Only count assessments with nilai > 0
 
                 if ($hasValidDates) {
                     $employeeAssessmentsQuery->whereBetween('waktu_penilaian', [$startDate, $endDate]);
