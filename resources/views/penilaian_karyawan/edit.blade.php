@@ -56,8 +56,9 @@
             @endcomponent
         </div>
 
-        <form action="{{ route('penilaian_karyawan.store') }}" method="POST" id="scoringForm">
+        <form action="{{ route('penilaian_karyawan.update', $employee->id_karyawan) }}" method="POST" id="scoringForm">
             @csrf
+            @method('PUT')
             <input type="hidden" name="id_karyawan" value="{{ $employee->id_karyawan }}">
             <input type="hidden" name="waktu_penilaian" value="{{ now()->format('Y-m-d') }}">
 
@@ -204,7 +205,7 @@
                             <a href="{{ route('penilaian_karyawan.index', ['start_date' => $startDate, 'end_date' => $endDate]) }}" class="btn btn-secondary btn-lg">
                                 <i class="fal fa-times"></i> Batal
                             </a>
-                            <button type="submit" class="btn btn-primary btn-lg">
+                            <button type="submit" class="btn btn-success btn-lg">
                                 <i class="fal fa-save"></i> Simpan Penilaian
                             </button>
                         </div>
