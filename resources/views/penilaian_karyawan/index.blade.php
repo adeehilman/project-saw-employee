@@ -136,7 +136,7 @@
                     @endif
                 </x-panel.tool-bar>
             </x-slot>
-            
+
             @if($approvedCriteria->count() > 0)
                 <table id="employees-table" class="table table-bordered table-hover table-striped w-100">
                     <thead>
@@ -216,7 +216,7 @@
                                         <i class="fal fa-star"></i> {{ $assessmentCount > 0 ? 'Edit' : 'Nilai' }}
                                     </a>
                                     @if($assessmentCount > 0)
-                                        <button type="button" class="btn btn-danger btn-sm" 
+                                        <button type="button" class="btn btn-danger btn-sm"
                                                 onclick="confirmDeleteAssessments('{{ $employee->id_karyawan }}', '{{ $employee->nama_karyawan }}')">
                                             <i class="fal fa-trash"></i> Hapus
                                         </button>
@@ -501,7 +501,7 @@
             message += `. Tindakan ini tidak dapat dibatalkan.`;
 
             $('#deleteMessage').text(message);
-            $('#deleteForm').attr('action', `{{ route('penilaian_karyawan.bulk-delete') }}`);
+            $('#deleteForm').attr('action', `{{ route('penilaian_karyawan.bulk-delete', ${employeeId}) }}`);
 
             // Add hidden inputs
             $('#deleteForm').find('input[name="start_date"]').remove();
