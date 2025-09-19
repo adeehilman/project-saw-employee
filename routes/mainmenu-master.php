@@ -80,7 +80,7 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/store', [PenilaianKaryawanController::class, 'store'])->name('penilaian_karyawan.store');
         Route::put('/{employee}', [PenilaianKaryawanController::class, 'update'])->name('penilaian_karyawan.update');
         Route::delete('/{assessment}', [PenilaianKaryawanController::class, 'destroy'])->name('penilaian_karyawan.destroy');
-        Route::delete('/bulk-delete', [PenilaianKaryawanController::class, 'bulkDelete'])->name('penilaian_karyawan.bulk-delete');
+        Route::post('/bulk-delete', [PenilaianKaryawanController::class, 'bulkDelete'])->name('penilaian_karyawan.bulk-delete');
     });
 
         // Approval routes - accessible by leadership roles

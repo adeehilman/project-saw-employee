@@ -259,7 +259,7 @@
                 </div>
                 <form id="deleteForm" method="POST">
                     @csrf
-                    @method('DELETE')
+                    @method('POST')
                     <div class="modal-body">
                         <div class="alert alert-warning">
                             <h6><i class="fal fa-exclamation-triangle"></i> Peringatan</h6>
@@ -509,7 +509,7 @@
             message += `. Tindakan ini tidak dapat dibatalkan.`;
 
             $('#deleteMessage').text(message);
-            
+
             // Fix the route generation - use proper URL generation
             let deleteUrl = '{{ route('penilaian_karyawan.bulk-delete') }}';
             $('#deleteForm').attr('action', deleteUrl);
