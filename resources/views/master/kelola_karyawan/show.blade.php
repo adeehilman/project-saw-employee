@@ -38,6 +38,7 @@
                 <div class="card-body">
                     <p><strong>ID Karyawan:</strong> {{ $dataKaryawan->id_karyawan }}</p>
                     <p><strong>Nama Lengkap:</strong> {{ $dataKaryawan->nama_karyawan }}</p>
+                    <p><strong>Email:</strong> {{ $dataKaryawan->email }}</p>
                     <p><strong>Jenis Kelamin:</strong> {{ $dataKaryawan->jenis_kelamin }}</p>
                     <p><strong>Jabatan:</strong> {{ $dataKaryawan->jabatan }}</p>
                     <p><strong>Tanggal Masuk:</strong> {{ $dataKaryawan->tanggal_masuk }}</p>

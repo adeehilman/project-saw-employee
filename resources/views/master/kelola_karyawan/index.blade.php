@@ -26,6 +26,7 @@
                     <tr>
 
                         <th>Nama Lengkap</th>
+                        <th>Email</th>
                         <th>Jenis Kelamin</th>
                         <th>Jabatan</th>
                         <th>Tanggal masuk</th>
@@ -37,6 +38,7 @@
                         <tr>
 
                             <td>{{ $karyawan->nama_karyawan }}</td>
+                            <td>{{ $karyawan->email}}</td>
                             <td>{{ $karyawan->jenis_kelamin }}</td>
                             <td>{{ $karyawan->jabatan }}</td>
                             <td>{{ $karyawan->tanggal_masuk }}</td>

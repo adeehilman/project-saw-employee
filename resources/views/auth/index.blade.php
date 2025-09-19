@@ -47,7 +47,7 @@ License: You must have a valid license purchased only from wrapbootstrap.com (li
         <div
             class="page-logo m-0 w-100 align-items-center justify-content-center rounded border-bottom-left-radius-0 border-bottom-right-radius-0 px-4">
             <a href="javascript:void(0)" class="page-logo-link press-scale-down d-flex align-items-center">
-                <img src="/admin/img/{{ $profileApp->app_logo ?? '' }}" alt="{{ $profileApp->app_nama ?? '' }} "
+                <img src="/admin/img/8.png" alt="{{ $profileApp->app_nama ?? '' }} "
                     aria-roledescription="logo">
                 <span class="page-logo-text mr-1">{{ $profileApp->app_nama ?? '' }}</span>
 

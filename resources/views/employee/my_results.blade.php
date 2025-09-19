@@ -150,8 +150,8 @@
                             <div class="total-score text-primary">{{ number_format($sawDetails['saw_score_percentage'], 2) }}</div>
                             <div class="progress mt-3">
                                 <div class="progress-bar {{ $sawDetails['saw_score_percentage'] >= 80 ? 'bg-success' : ($sawDetails['saw_score_percentage'] >= 60 ? 'bg-warning' : 'bg-danger') }}" 
-                                     role="progressbar" 
-                                     style="width: {{ min(100, $sawDetails['saw_score_percentage']) }}%">
+                                    role="progressbar" 
+                                    style="width: {{ min(100, $sawDetails['saw_score_percentage']) }}%">
                                 </div>
                             </div>
                             <small class="text-muted">Metode SAW</small>

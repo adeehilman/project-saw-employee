@@ -5,7 +5,7 @@
 @endsection
 @section('pages-content')
     @component('inc._auth_header')
-        <a href="/login" class="btn btn-primary text-white ml-auto">
+        <a href="login/" class="btn btn-primary text-white ml-auto">
             Login
         </a>
     @endcomponent
@@ -42,16 +42,13 @@
                 </div>
                 <div class="col-sm-12 col-md-6 col-lg-5 col-xl-4 ml-auto hidden-sm-down">
                     <div class="py-4">
-                        <img src="/admin/img/siswakumpul.png" class="display-3 img-responsive" height="400"
-                            alt="Employee Assessment System">
+                        <img src="/admin/img/karyawan.png" class="display-3 img-responsive" height="230"
+                            alt="Employee Assessment System"> 
                     </div>
                 </div>
             </div>
             <div class="position-absolute pos-bottom pos-left pos-right p-3 text-center text-white">
-                {{ $profileApp->app_tahun ?? '' }} - @php echo date('Y'); @endphp © {{ $profileApp->app_pengembang ?? '' }}
-                by&nbsp;<a href="https://laravel.com/docs/10.x" title='laravel.com' class="btn-link font-weight-bold"
-                    target="_blank">Laravel
-                    v{{ Illuminate\Foundation\Application::VERSION }} (PHP v{{ PHP_VERSION }})</a>
+            {{ $profileApp->app_tahun ?? '' }} - @php echo date('Y'); @endphp © {{ $profileApp->app_pengembang ?? '' }}
             </div>
         </div>
     </div>
