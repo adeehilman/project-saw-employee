@@ -53,6 +53,7 @@ class KelolaKaryawanController extends Controller
 
             DataKaryawan::create([
                 'nama_karyawan' => $request->nama_karyawan,
+                'email' => $request->email,
                 'jenis_kelamin' => $request->jeniskelamin,
                 'tanggal_masuk' => $request->tanggal_masuk,
                 'jabatan' => $request->jabatan,
