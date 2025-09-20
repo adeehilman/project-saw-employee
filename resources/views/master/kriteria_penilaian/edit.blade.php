@@ -22,7 +22,7 @@
         <form action="{{ route('kriteria_bobot.update', $dataKriteria) }}" method="POST">
             @csrf
             @method('PUT')
-            <x-panel.show title="Default" subtitle="Example">
+            <x-panel.show title="Edit" subtitle="Kriteria dan Bobot">
                 <x-slot name="paneltoolbar">
                     <x-panel.tool-bar>
                         <button class="btn btn-toolbar-master" type="button" data-toggle="dropdown" aria-haspopup="true"
