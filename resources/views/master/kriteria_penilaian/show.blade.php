@@ -18,7 +18,7 @@
             @endcomponent
         </div>
 
-        <x-panel.show title="" subtitle="">
+        <x-panel.show title="Detail" subtitle="Kriteria dan Bobot">
             <x-slot name="paneltoolbar">
                 <x-panel.tool-bar>
                     <button class="btn btn-toolbar-master" type="button" data-toggle="dropdown" aria-haspopup="true"
