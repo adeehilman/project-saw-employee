@@ -297,7 +297,7 @@ class PenilaianKaryawanController extends Controller
                     ->where('id_kriteria_bobot', $kriteriaId)
                     ->first();
 
-                if ($existingAssessment) {
+                if (COUNT($existingAssessment) > 0) {
                     // Update existing assessment
                     $existingAssessment->update([
                         'nilai' => $nilai,
