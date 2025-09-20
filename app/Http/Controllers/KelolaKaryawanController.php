@@ -46,7 +46,7 @@ class KelolaKaryawanController extends Controller
                 'name' => $request->nama_karyawan,
                 'username' => $username,
                 'email' => $request->email,
-                'password' => Hash::make('Passs0wrd'),
+                'password' => Hash::make('password'),
                 'role' => 'Karyawan', // bisa diganti sesuai kebutuhan
             ]);
 
