@@ -59,8 +59,10 @@ class PenilaianKaryawan extends Model
      */
     public static function generateId()
     {
-        $count = static::count() + 1;
-        return 'PNL' . str_pad($count, 6, '0', STR_PAD_LEFT);
+        $lastRecord = static::orderBy('id_penilaian', 'desc')->first();
+        $lastId = $lastRecord ? intval(substr($lastRecord->id_penilaian, 3)) : 0;
+        $newId = $lastId + 1;
+        return 'PNL' . str_pad($newId, 6, '0', STR_PAD_LEFT);
     }
 
 
