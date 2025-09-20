@@ -52,14 +52,14 @@ class PenilaianBobotKaryawanController extends Controller
 
     public function show($id)
     {
-        $dataGuru = KriteriaBobot::findOrFail($id);
-        return view('master.kriteria_penilaian.show', compact('dataGuru'));
+        $dataKriteria = KriteriaBobot::findOrFail($id);
+        return view('master.kriteria_penilaian.show', compact('dataKriteria'));
     }
 
     public function edit($id)
     {
-        $dataGuru = KriteriaBobot::findOrFail($id);
-        return view('master.kriteria_penilaian.edit', compact('dataGuru'));
+        $dataKriteria = KriteriaBobot::findOrFail($id);
+        return view('master.kriteria_penilaian.edit', compact('dataKriteria'));
     }
 
     public function update(Request $request, $id)

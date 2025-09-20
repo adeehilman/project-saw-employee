@@ -19,7 +19,7 @@
             @endcomponent
         </div>
 
-        <form action="{{ route('kriteria_bobot.update', $dataGuru) }}" method="POST">
+        <form action="{{ route('kriteria_bobot.update', $dataKriteria) }}" method="POST">
             @csrf
             @method('PUT')
             <x-panel.show title="Default" subtitle="Example">
@@ -37,13 +37,13 @@
                 <div class="form-group">
                     <label for="kriteria">Kriteria</label>
                     <input type="text" name="kriteria" id="kriteria" class="form-control"
-                        value="{{ old('kriteria', $dataGuru->kriteria) }}" required>
+                        value="{{ old('kriteria', $dataKriteria->kriteria) }}" required>
                 </div>
 
                 <div class="form-group">
                     <label for="bobot">Bobot</label>
                     <input type="number" name="bobot" id="bobot" class="form-control" min="1" max="100"
-                        value="{{ old('bobot', $dataGuru->bobot) }}" required>
+                        value="{{ old('bobot', $dataKriteria->bobot) }}" required>
                 </div>
                 <x-slot name="panelcontentfoot">
                     <x-button type="submit" color="primary" :label="__('Update')" class="ml-auto" />

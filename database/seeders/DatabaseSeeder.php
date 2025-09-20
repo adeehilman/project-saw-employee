@@ -26,7 +26,7 @@ class DatabaseSeeder extends Seeder
             OpsiLoginSeeder::class,
             BidangKeahlianSeeder::class,
             ProgramKeahlianSeeder::class,
-            DataGuruSeeder::class,
+            dataKriteriaSeeder::class,
         ]);
     }
 }

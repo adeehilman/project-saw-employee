@@ -2,7 +2,7 @@
 
 use App\Http\Controllers\AppFiturController;
 use App\Http\Controllers\AppProfileController;
-// use App\Http\Controllers\DataGuruController;
+// use App\Http\Controllers\dataKriteriaController;
 use App\Http\Controllers\KelolaKaryawanController;
 use App\Http\Controllers\PenilaianBobotKaryawanController;
 use App\Http\Controllers\MasterController;
