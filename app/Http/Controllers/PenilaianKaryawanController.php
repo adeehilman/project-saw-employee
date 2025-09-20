@@ -310,6 +310,7 @@ class PenilaianKaryawanController extends Controller
                         'id_penilaian' => PenilaianKaryawan::generateId(),
                         'id_karyawan' => $employeeId,
                         'id_kriteria_bobot' => $kriteriaId,
+                        'waktu_penilaian' => now(),
                         'nilai' => $nilai,
                         'catatan' => $catatan[$kriteriaId] ?? null,
                         'dinilai_oleh' => Auth::id()
