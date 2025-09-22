@@ -10,6 +10,7 @@ use App\Services\SAWCalculationService;
 use App\Exports\EmployeeAssessmentExport;
 use App\Exports\EmployeeAssessmentCSVExport;
 use App\Exports\EmployeeAssessmentPDFExport;
+use App\Exports\PenilaianKaryawanDetailExport; // Added new export class
 use Illuminate\Support\Facades\Auth;
 use Maatwebsite\Excel\Facades\Excel;
 use Carbon\Carbon;
@@ -414,20 +415,90 @@ class PenilaianKaryawanController extends Controller
         $startDate = $request->get('start_date');
         $endDate = $request->get('end_date');
         $format = $request->get('format', 'excel'); // excel, csv, pdf
+        $employeeId = $request->get('employee_id'); // Optional employee filter
+        $exportType = $request->get('export_type', 'saw'); // saw or detail
 
         // Check if dates are provided and valid
         $hasValidDates = $startDate && $endDate && $this->isValidDate($startDate) && $this->isValidDate($endDate);
 
         try {
+            // If employeeId and exportType is detail, export penilaian karyawan details
+            if ($employeeId && $exportType === 'detail') {
+                // Get employee data
+                $employee = DataKaryawan::find($employeeId);
+                if (!$employee) {
+                    return response()->json(['error' => 'Employee not found'], 404);
+                }
+
+                // Get penilaian karyawan data for this employee
+                $query = PenilaianKaryawan::where('id_karyawan', $employeeId)
+                    ->with(['kriteriaBobot', 'penilai']);
+
+                if ($hasValidDates) {
+                    $query->whereBetween('waktu_penilaian', [$startDate, $endDate]);
+                }
+
+                $penilaianData = $query->get();
+
+                // Create filename
+                $employeeName = str_replace(' ', '_', $employee->nama_karyawan);
+                if ($hasValidDates) {
+                    $startFormatted = Carbon::parse($startDate)->format('Y_m_d');
+                    $endFormatted = Carbon::parse($endDate)->format('Y_m_d');
+                    $filename = 'detail_penilaian_' . $employeeName . '_' . $startFormatted . '_to_' . $endFormatted;
+                } else {
+                    $filename = 'detail_penilaian_' . $employeeName . '_all_data_' . now()->format('Y_m_d');
+                }
+
+                // Set period for export classes
+                $period = $hasValidDates ? "$startDate to $endDate" : "All Data";
+
+                // Export based on format
+                switch ($format) {
+                    case 'csv':
+                        // For CSV, we'll use the same detail export but with CSV format
+                        $export = new PenilaianKaryawanDetailExport($penilaianData, $employee, $period);
+                        return Excel::download($export, $filename . '.csv', \Maatwebsite\Excel\Excel::CSV);
+
+                    case 'pdf':
+                        // For PDF, we'll use the same detail export but with PDF format
+                        $export = new PenilaianKaryawanDetailExport($penilaianData, $employee, $period);
+                        return Excel::download($export, $filename . '.pdf', \Maatwebsite\Excel\Excel::DOMPDF);
+
+                    case 'excel':
+                    default:
+                        $export = new PenilaianKaryawanDetailExport($penilaianData, $employee, $period);
+                        $response = Excel::download($export, $filename . '.xlsx');
+
+                        // Add explicit headers to prevent browser misinterpretation
+                        $response->headers->set('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+                        $response->headers->set('Content-Disposition', 'attachment; filename="' . $filename . '.xlsx"');
+                        $response->headers->set('Cache-Control', 'max-age=0');
+
+                        return $response;
+                }
+            }
+
             // Get SAW results for comprehensive export
             $sawService = app(SAWCalculationService::class);
             $sawResults = $sawService->calculateSAWScores($startDate, $endDate);
+
+            // Filter results by employee ID if provided
+            if ($employeeId) {
+                $sawResults = collect($sawResults)->filter(function ($result) use ($employeeId) {
+                    return $result['employee']->id_karyawan == $employeeId;
+                })->values();
+            }
 
             $criteriaStats = $sawService->getCriteriaStatistics($startDate, $endDate);
             $approvedCriteria = KriteriaBobot::where('status', 'Disetujui')->get();
 
             // Create filename
-            if ($hasValidDates) {
+            if ($employeeId && $sawResults->isNotEmpty()) {
+                // If filtering by employee, include employee name in filename
+                $employeeName = $sawResults->first()['employee']->nama_karyawan;
+                $filename = 'hasil_penilaian_' . str_replace(' ', '_', $employeeName);
+            } elseif ($hasValidDates) {
                 $startFormatted = \Carbon\Carbon::parse($startDate)->format('Y_m_d');
                 $endFormatted = \Carbon\Carbon::parse($endDate)->format('Y_m_d');
                 $filename = 'hasil_penilaian_' . $startFormatted . '_to_' . $endFormatted;
