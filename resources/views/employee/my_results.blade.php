@@ -47,7 +47,7 @@
         </div>
 
         <!-- Filter Date Range -->
-        <x-panel.show title="Filter Periode Penilaian" subtitle="Pilih rentang tanggal untuk melihat hasil penilaian">
+        {{-- <x-panel.show title="Filter Periode Penilaian" subtitle="Pilih rentang tanggal untuk melihat hasil penilaian">
             <form method="GET" action="{{ route('employee.my_results') }}" class="row">
                 <div class="col-md-4">
                     <label for="start_date" class="form-label">Tanggal Mulai</label>
@@ -66,7 +66,7 @@
                     </a>
                 </div>
             </form>
-        </x-panel.show>
+        </x-panel.show> --}}
 
         <!-- Employee Info & Score Summary -->
         <div class="row">
@@ -149,8 +149,8 @@
                             <h5 class="card-title">Skor SAW Saya</h5>
                             <div class="total-score text-primary">{{ number_format($sawDetails['saw_score_percentage'], 2) }}</div>
                             <div class="progress mt-3">
-                                <div class="progress-bar {{ $sawDetails['saw_score_percentage'] >= 80 ? 'bg-success' : ($sawDetails['saw_score_percentage'] >= 60 ? 'bg-warning' : 'bg-danger') }}" 
-                                    role="progressbar" 
+                                <div class="progress-bar {{ $sawDetails['saw_score_percentage'] >= 80 ? 'bg-success' : ($sawDetails['saw_score_percentage'] >= 60 ? 'bg-warning' : 'bg-danger') }}"
+                                    role="progressbar"
                                     style="width: {{ min(100, $sawDetails['saw_score_percentage']) }}%">
                                 </div>
                             </div>
@@ -222,7 +222,7 @@
                         </tfoot>
                     </table>
                 </div>
-                
+
                 <div class="mt-3">
                     <h6>Keterangan Perhitungan:</h6>
                     <ul class="list-unstyled">
@@ -297,7 +297,7 @@
                     <i class="fal fa-star text-muted" style="font-size: 4rem;"></i>
                     <h4 class="mt-3">Belum Ada Penilaian</h4>
                     <p class="text-muted">
-                        Anda belum dinilai untuk periode 
+                        Anda belum dinilai untuk periode
                         @if($startDate && $endDate)
                             {{ \Carbon\Carbon::parse($startDate)->format('d/m/Y') }} - {{ \Carbon\Carbon::parse($endDate)->format('d/m/Y') }}
                         @else
@@ -319,7 +319,7 @@
                                 <h6 class="mb-1">{{ $assessment->kriteriaBobot->kriteria }}</h6>
                                 <p class="mb-1">{{ $assessment->catatan }}</p>
                                 <small class="text-muted">
-                                    Oleh: {{ $assessment->penilai->name }} • 
+                                    Oleh: {{ $assessment->penilai->name }} •
                                     {{ $assessment->updated_at->format('d/m/Y H:i') }}
                                 </small>
                             </div>
