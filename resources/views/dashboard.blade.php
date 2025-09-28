@@ -67,39 +67,6 @@
                         </div>
                     </div>
                 </div>
-                <br>
-                <p class="panel-tag fw-500">
-                    To see all list of Core plugins for a barebone version please visit the <a href="/plugin_faq"
-                        class="fw-500"> Plugin FAQ</a> page.
-                </p>
-                <div class="mb-g">
-                    <h4><i class="fal fa-exclamation text-danger"></i> Select a plugin from the list below for full
-                        documentation</h4>
-                    <p class="text-faded fs-nano">Disclaimer: Third party plugins are left unchanged, all third party
-                        plugins have limited support (to design elements only), and you must refer to the documentation via
-                        plugin's official website</p>
-                    <select class="js-plugins custom-select form-control" style="width:15rem;">
-                        <option value="">-- Select Plugin --</option>
-                    </select>
-                </div>
-                <div id="js-display" class="d-none">
-                    <h5 class="fw-700">
-                        <span class="js-plugin-name"></span>
-                    </h5>
-                    <p>
-                        <span class="js-plugin-description"></span>
-                    </p>
-                    <p>
-                        <strong>Documentation:</strong>
-                        <br>
-                        <a href="" class="js-plugin-url" target="_blank"></a>
-                    </p>
-                    <p>
-                        <strong>License:</strong>
-                        <br>
-                        <span class="js-plugin-license"></span>
-                    </p>
-                </div>
             </div>
         </div>
     </main>
