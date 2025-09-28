@@ -7,7 +7,7 @@
     </li>
 
     @if (auth()->user()->role == 'Karyawan')
-        
+
         <li class="{{ Request::is('hasil-penilaian-saya*') ? 'active' : '' }}">
             <a href="{{ route('employee.my_results') }}" title="Lihat Hasil Penilaian Saya"
                 data-filter-tags="hasil penilaian saya karyawan">
@@ -20,10 +20,10 @@
         @include('inc.mainmenu._menu_master')
     @endif
     <div class="m-0 w-100 p-2"></div>
-    <li class="{{ Request::is('about') ? 'active' : '' }}">
+    {{-- <li class="{{ Request::is('about') ? 'active' : '' }}">
         <a href="/about" title="About" data-filter-tags="application about">
             <i class="fal fa-info-circle"></i>
             <span class="nav-link-text" data-i18n="nav.application_about">About</span>
         </a>
-    </li>
+    </li> --}}
 </ul>
