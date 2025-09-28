@@ -417,6 +417,7 @@ class PenilaianKaryawanController extends Controller
         $format = $request->get('format', 'excel'); // excel, csv, pdf
         $employeeId = $request->get('employee_id'); // Optional employee filter
         $exportType = $request->get('export_type', 'saw'); // saw or detail
+        $exportSelf = $request->get('export_self', false); // If true, only export data for this employee ID
 
         // Check if dates are provided and valid
         $hasValidDates = $startDate && $endDate && $this->isValidDate($startDate) && $this->isValidDate($endDate);
@@ -484,7 +485,7 @@ class PenilaianKaryawanController extends Controller
             $sawResults = $sawService->calculateSAWScores($startDate, $endDate);
 
             // Filter results by employee ID if provided
-            if ($employeeId) {
+            if ($employeeId && $exportSelf) {
                 $sawResults = collect($sawResults)->filter(function ($result) use ($employeeId) {
                     return $result['employee']->id_karyawan == $employeeId;
                 })->values();
@@ -494,7 +495,7 @@ class PenilaianKaryawanController extends Controller
             $approvedCriteria = KriteriaBobot::where('status', 'Disetujui')->get();
 
             // Create filename
-            if ($employeeId && $sawResults->isNotEmpty()) {
+            if ($employeeId && $sawResults->isNotEmpty() && $exportSelf) {
                 // If filtering by employee, include employee name in filename
                 $employeeName = $sawResults->first()['employee']->nama_karyawan;
                 $filename = 'hasil_penilaian_' . str_replace(' ', '_', $employeeName);
@@ -537,8 +538,8 @@ class PenilaianKaryawanController extends Controller
                 'error' => 'Export failed: ' . $e->getMessage()
             ], 500);
         }
-    }
 
+    }
     /**
      * Bulk delete assessments for a date range
      */

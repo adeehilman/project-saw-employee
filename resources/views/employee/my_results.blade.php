@@ -47,26 +47,30 @@
         </div>
 
         <!-- Filter Date Range -->
-        {{-- <x-panel.show title="Filter Periode Penilaian" subtitle="Pilih rentang tanggal untuk melihat hasil penilaian">
-            <form method="GET" action="{{ route('employee.my_results') }}" class="row">
-                <div class="col-md-4">
-                    <label for="start_date" class="form-label">Tanggal Mulai</label>
-                    <input type="date" class="form-control" id="start_date" name="start_date" value="{{ $startDate }}">
-                </div>
-                <div class="col-md-4">
-                    <label for="end_date" class="form-label">Tanggal Akhir</label>
-                    <input type="date" class="form-control" id="end_date" name="end_date" value="{{ $endDate }}">
-                </div>
-                <div class="col-md-4 d-flex align-items-end">
-                    <button type="submit" class="btn btn-primary me-2">
-                        <i class="fal fa-filter"></i> Filter
+        <x-panel.show title="Unduh Hasil" subtitle="Pilih untuk mengunduh hasil penilaian Anda">
+            <div>
+                <div class="btn-group ml-2">
+                    <button type="button" class="btn btn-success dropdown-toggle" data-toggle="dropdown">
+                        <i class="fal fa-download"></i> Unduh Hasil
                     </button>
-                    <a href="{{ route('employee.my_results') }}" class="btn btn-secondary">
-                        <i class="fal fa-times"></i> Reset
-                    </a>
+                    <div class="dropdown-menu">
+                        <a class="dropdown-item" href="#" onclick="exportData('excel')">
+                            <i class="fal fa-file-excel"></i> Export Excel
+                        </a>
+                        <a class="dropdown-item" href="#" onclick="exportData('csv')">
+                            <i class="fal fa-file-csv"></i> Export CSV
+                        </a>
+                        <a class="dropdown-item" href="#" onclick="exportData('pdf')">
+                            <i class="fal fa-file-pdf"></i> Export PDF
+                        </a>
+                        <div class="dropdown-divider"></div>
+                        <a class="dropdown-item" href="#" onclick="showExportModal()">
+                            <i class="fal fa-cog"></i> Opsi Export
+                        </a>
+                    </div>
                 </div>
-            </form>
-        </x-panel.show> --}}
+            </div>
+        </x-panel.show>
 
         <!-- Employee Info & Score Summary -->
         <div class="row">
@@ -329,12 +333,131 @@
                 @endforeach
             </x-panel.show>
         @endif
+
+         <!-- Export Options Modal -->
+    <div class="modal fade" id="exportModal" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Opsi Export Hasil Penilaian</h5>
+                    <button type="button" class="close" data-dismiss="modal">
+                        <span>&times;</span>
+                    </button>
+                </div>
+                <form id="exportForm">
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <label for="export-format">Format File:</label>
+                            <select id="export-format" class="form-control">
+                                <option value="excel">Excel (.xlsx)</option>
+                                <option value="csv">CSV (.csv)</option>
+                                <option value="pdf">PDF (.pdf)</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group d-none">
+                            <label for="export-start-date">Tanggal Mulai:</label>
+                            <input type="date" id="export-start-date" class="form-control" value="{{ now()->format('Y-m-d') }}" onchange="this.form.submit()">
+                        </div>
+
+                        <div class="form-group d-none">
+                            <label for="export-end-date">Tanggal Akhir:</label>
+                            <input type="date" id="export-end-date" class="form-control" value="{{ now()->format('Y-m-d') }}" onchange="this.form.submit()">
+                        </div>
+
+                        <div class="alert alert-info">
+                            <h6><i class="fal fa-info-circle"></i> Informasi Export</h6>
+                            <ul class="mb-0">
+                                <li><strong>Excel:</strong> Format .xlsx dengan multiple sheets (Hasil, Statistik, Detail Perhitungan)</li>
+                                <li><strong>CSV:</strong> Format data mentah, cocok untuk analisis lebih lanjut</li>
+                                <li><strong>PDF:</strong> Format laporan siap cetak dengan ranking dan statistik</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
+                        <button type="button" class="btn btn-success" onclick="processExport()">
+                            <i class="fal fa-download"></i> Unduh Sekarang
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
     </main>
 @endsection
 
 @section('pages-script')
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
     <script>
+
+         // Export data with format
+        function exportData(format = 'excel') {
+            const startDate = '{{ $startDate }}';
+            const endDate = '{{ $endDate }}';
+            const employeeId = '{{ $employee->id_karyawan }}';
+
+            let url = `{{ route('penilaian_karyawan.export') }}?format=${format}&export_type=detail`;
+            if (startDate && endDate) {
+                url += `&start_date=${startDate}&end_date=${endDate}`;
+            }
+            // Add employee ID to export only this employee's data
+            url += `&employee_id=${employeeId}`;
+
+            // Create temporary link and trigger download
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = '';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        // Show export modal
+        function showExportModal() {
+            const startDate = '{{ $startDate }}';
+            const endDate = '{{ $endDate }}';
+
+            if (startDate && endDate) {
+                $('#export-start-date').val(startDate);
+                $('#export-end-date').val(endDate);
+            } else {
+                // Set current month as default
+                $('#export-start-date').val(moment().startOf('month').format('YYYY-MM-DD'));
+                $('#export-end-date').val(moment().endOf('month').format('YYYY-MM-DD'));
+            }
+            $('#exportModal').modal('show');
+        }
+
+        // Process export from modal
+        function processExport() {
+            // Get form values
+            const format = $('#export-format').val();
+            const startDate = $('#export-start-date').val();
+            const endDate = $('#export-end-date').val();
+            const employeeId = '{{ $employee->id_karyawan }}';
+            const isExportSelf = true;
+
+            // Build URL
+            let url = `{{ route('penilaian_karyawan.export') }}?format=${format}&export_type=detail&employee_id=${employeeId}&is_export_self=${isExportSelf}`;
+
+            if (startDate && endDate) {
+                url += `&start_date=${startDate}&end_date=${endDate}`;
+            }
+
+            // Create temporary link and trigger download
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = '';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+
+            // Close modal
+            $('#exportModal').modal('hide');
+        }
+
         @if($assessments->count() > 0)
         // Create assessment chart
         const ctx = document.getElementById('myAssessmentChart').getContext('2d');
