@@ -105,7 +105,10 @@ class KelolaKaryawanController extends Controller
     public function destroy($id)
     {
         $dataKaryawan = DataKaryawan::findOrFail($id);
+        $dataUser = User::where('id', $dataKaryawan->user_id)->first();
         $dataKaryawan->delete();
+        $dataUser->delete();
+
 
         return redirect()->route('kelola-karyawan.index')->with('success', 'Data Guru deleted successfully.');
     }
