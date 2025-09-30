@@ -13,6 +13,7 @@ use App\Exports\EmployeeAssessmentPDFExport;
 use App\Exports\PenilaianKaryawanDetailExport; // Added new export class
 use Illuminate\Support\Facades\Auth;
 use Maatwebsite\Excel\Facades\Excel;
+use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 
 class PenilaianKaryawanController extends Controller
@@ -161,6 +162,24 @@ class PenilaianKaryawanController extends Controller
                         'catatan' => $catatan[$kriteriaId] ?? null,
                         'dinilai_oleh' => Auth::id()
                     ]);
+
+                        $hasilPenilaian = DB::table('hasil_penilaian')->where('id_karyawan', $employeeId)->first();
+                        if ($hasilPenilaian) {
+                            $total_nilai = $hasilPenilaian->total_nilai + $nilai;
+                            DB::table('hasil_penilaian')
+                                ->where('id_karyawan', $employeeId)
+                                ->update([
+                                    'total_nilai' => $total_nilai,
+                                    'waktu_penilaian' => $period
+                                ]);
+                        } else {
+                            DB::table('hasil_penilaian')->insert([
+                                'id_karyawan' => $employeeId,
+                                'total_nilai' => $nilai,
+                                'waktu_penilaian' => $period
+                            ]);
+                        }
+
                 }
             }
 
