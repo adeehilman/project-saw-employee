@@ -23,7 +23,11 @@ class PenilaianBobotKaryawanController extends Controller
 
     public function create()
     {
-        return view('master.kriteria_penilaian.create');
+        $dataBobotDisetujui = KriteriaBobot::all();
+        $totalBobot = $dataBobotDisetujui->sum('bobot');
+
+        $availableBobot = 100 - $totalBobot;
+        return view('master.kriteria_penilaian.create', compact('availableBobot'));
     }
 
     public function store(Request $request)
@@ -34,6 +38,15 @@ class PenilaianBobotKaryawanController extends Controller
                 'bobot' => 'required|numeric|min:1|max:100',
             ]);
 
+            $dataBobotDisetujui = KriteriaBobot::all();
+            $totalBobot = $dataBobotDisetujui->sum('bobot');
+
+            $availableBobot = 100 - $totalBobot;
+
+            // Make sure the bobot is not exceeding the available limit
+            if ($request->bobot > $availableBobot) {
+                return redirect()->back()->withInput()->with('error', 'Bobot tidak boleh melebihi batas yang tersedia');
+            }
             // Create criteria with pending status
             $KriteriaBobot = KriteriaBobot::create([
                 'kriteria' => $request->kriteria,

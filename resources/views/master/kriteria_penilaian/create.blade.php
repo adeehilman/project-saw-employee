@@ -44,8 +44,40 @@
 
                 <div class="form-group">
                     <label for="bobot">Bobot</label>
-                    <input type="number" name="bobot" id="bobot" class="form-control" min="1" max="100" value="{{ old('bobot') }}" required>
+                    <input type="number" name="bobot" id="bobot" class="form-control" min="1" max="100" value="{{ old('bobot') }}" required
+                        data-bobot-awal="{{ (int) $availableBobot }}"
+                    >
+                    <div class="alert alert-danger mt-2" role="alert" id="alert-remaining">
+                        <strong id="remaining-label">
+                            Sisa bobot yang tersedia adalah {{ (int) $availableBobot }}.
+                        </strong>
+                    </div>
                 </div>
+                <script>
+                    const input = document.getElementById('bobot');
+                    const remainingLabel = document.getElementById('remaining-label');
+
+                    function updateState() {
+                        let val = Number(input.value);
+
+                        if (!Number.isFinite(val) || val < 1) val = 1;
+                        if (val > {{ (int) $availableBobot }}) val = {{ (int) $availableBobot }};
+
+                        // Hitung sisa pool setelah perubahan terhadap bobotAwal
+                        const delta = val - {{ (int) $availableBobot }};
+                        const remaining = Math.max(0, {{ (int) $availableBobot }} - Math.max(0, delta));
+
+                        // Tampilkan
+                        input.value = val; // tulis kembali jika ter-clamp
+                        remainingLabel.textContent = `Sisa bobot yang tersedia adalah ${remaining}.`;
+                    }
+
+                    // Inisialisasi awal (pastikan label konsisten dengan nilai awal/old)
+                    updateState();
+
+                    // Reaktif saat user mengetik / scroll number input
+                    input.addEventListener('input', updateState);
+                </script>
                 <x-slot name="panelcontentfoot">
                     <x-button type="submit" color="primary" :label="__('Save')" class="ml-auto" />
                 </x-slot>
