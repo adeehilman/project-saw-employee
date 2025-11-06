@@ -42,8 +42,23 @@
 
                 <div class="form-group">
                     <label for="bobot">Bobot</label>
-                    <input type="number" name="bobot" id="bobot" class="form-control" min="1" max="100"
-                        value="{{ old('bobot', $dataKriteria->bobot) }}" required>
+                    <input
+                        type="number"
+                        name="bobot"
+                        id="bobot"
+                        class="form-control"
+                        min="1"
+                        value="{{ old('bobot', $dataKriteria->bobot) }}"
+                        required
+                        {{-- simpan meta untuk JS --}}
+                        data-bobot-awal="{{ (int) $dataKriteria->bobot }}"
+                        data-available-pool="{{ (int) $availableBobot }}"
+                    >
+                    <div class="alert alert-danger mt-2" role="alert" id="alert-remaining">
+                        <strong id="remaining-label">
+                            Sisa bobot yang tersedia adalah {{ (int) $availableBobot }}.
+                        </strong>
+                    </div>
                 </div>
                 <x-slot name="panelcontentfoot">
                     <x-button type="submit" color="primary" :label="__('Update')" class="ml-auto" />
@@ -54,6 +69,44 @@
 @endsection
 @section('pages-script')
 <script>
+
+(function () {
+    const input = document.getElementById('bobot');
+    const remainingLabel = document.getElementById('remaining-label');
+
+    // Ambil angka dasar dari server
+    const bobotAwal = Number(input.dataset.bobotAwal || 0);          // bobot item saat ini (sebelum edit)
+    const availablePool = Number(input.dataset.availablePool || 0);   // sisa kuota di luar item ini
+
+    // Max legal = bobotAwal + availablePool
+    const maxAllowed = Math.max(1, bobotAwal + availablePool);
+    input.setAttribute('max', String(maxAllowed));
+
+    // Helper untuk update label & clamp
+    function updateState() {
+        let val = Number(input.value);
+
+        // Normalisasi NaN dan batas bawah/atas
+        if (!Number.isFinite(val) || val < 1) val = 1;
+        if (val > maxAllowed) val = maxAllowed;
+
+        // Hitung sisa pool setelah perubahan terhadap bobotAwal
+        const delta = val - bobotAwal;                 // berapa banyak kamu "memakan" pool
+        const remaining = Math.max(0, availablePool - Math.max(0, delta));
+
+        // Tampilkan
+        input.value = val; // tulis kembali jika ter-clamp
+        remainingLabel.textContent = `Sisa bobot yang tersedia adalah ${remaining}.`;
+    }
+
+    // Inisialisasi awal (pastikan label konsisten dengan nilai awal/old)
+    updateState();
+
+    // Reaktif saat user mengetik / scroll number input
+    input.addEventListener('input', updateState);
+    input.addEventListener('change', updateState);
+})();
+
  function confirmDelete(id) {
             bootbox.confirm({
                 message: "Apakah yakin akan di edit Kriteria dan Bobot ini?",

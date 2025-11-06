@@ -52,7 +52,7 @@
                                 <a href="{{ route('kriteria_bobot.show', $kriteria->id_kriteria) }}" class="btn btn-info btn-sm">
                                     <i class="fal fa-eye"></i> Detail
                                 </a>
-                                @if ($kriteria->status != 'Disetujui')
+                                {{-- @if ($kriteria->status != 'Disetujui') --}}
                                     <a href="{{ route('kriteria_bobot.edit', $kriteria->id_kriteria) }}" class="btn btn-warning btn-sm">
                                         <i class="fal fa-edit"></i> Edit
                                     </a>
@@ -63,11 +63,11 @@
                                             <i class="fal fa-trash"></i> Hapus
                                         </button>
                                     </form>
-                                @else
-                                    <span class="text-muted small">
+                                {{-- @else --}}
+                                    {{-- <span class="text-muted small">
                                         <i class="fal fa-lock"></i> Sudah disetujui
-                                    </span>
-                                @endif
+                                    </span> --}}
+                                {{-- @endifs --}}
                                 @if ($kriteria->status == 'Ditolak' && $kriteria->rejection_reason)
                                     <button type="button" class="btn btn-outline-danger btn-sm" onclick="showRejectionReason('{{ addslashes($kriteria->rejection_reason) }}')">
                                         <i class="fal fa-exclamation-triangle"></i> Alasan Penolakan

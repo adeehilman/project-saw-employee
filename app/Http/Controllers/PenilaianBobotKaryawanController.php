@@ -59,7 +59,12 @@ class PenilaianBobotKaryawanController extends Controller
     public function edit($id)
     {
         $dataKriteria = KriteriaBobot::findOrFail($id);
-        return view('master.kriteria_penilaian.edit', compact('dataKriteria'));
+        $dataBobotDisetujui = KriteriaBobot::all();
+        $totalBobot = $dataBobotDisetujui->sum('bobot');
+
+        $availableBobot = 100 - $totalBobot;
+
+        return view('master.kriteria_penilaian.edit', compact('dataKriteria', 'totalBobot', 'availableBobot'));
     }
 
     public function update(Request $request, $id)
@@ -73,7 +78,7 @@ class PenilaianBobotKaryawanController extends Controller
 
         // Only allow updates if not approved
         if ($kriteriaDanBobot->isApproved()) {
-            return redirect()->back()->with('error', 'Kriteria yang sudah disetujui tidak dapat diubah.');
+            // return redirect()->back()->with('error', 'Kriteria yang sudah disetujui tidak dapat diubah.');
         }
 
         $oldStatus = $kriteriaDanBobot->status;
