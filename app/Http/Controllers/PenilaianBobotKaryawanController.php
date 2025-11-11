@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\KriteriaBobot;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
+use App\Models\PenilaianKaryawan;
 
 class PenilaianBobotKaryawanController extends Controller
 {
@@ -116,7 +117,9 @@ class PenilaianBobotKaryawanController extends Controller
 
         // Only allow deletion if not approved
         if ($kriteria->isApproved()) {
-            return redirect()->back()->with('error', 'Kriteria yang sudah disetujui tidak dapat dihapus.');
+            // return redirect()->back()->with('error', 'Kriteria yang sudah disetujui tidak dapat dihapus.');
+
+            PenilaianKaryawan::where('id_kriteria_bobot', $id)->delete();
         }
 
         $kriteria->delete();
